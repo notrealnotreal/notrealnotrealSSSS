@@ -1,5 +1,10 @@
 local player = LocalPlayer
 
+local userId = Players:GetUserIdFromNameAsync("good_gamessim67")
+local thumbType = Enum.ThumbnailType.HeadShot
+local thumbSize = Enum.ThumbnailSize.Size420x420
+local content, isReady = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize)
+
 local character = player.Character or player.CharacterAdded:Wait()
 local hrp = character:WaitForChild("HumanoidRootPart")
 
@@ -23,6 +28,28 @@ evilbutton.Parent = gui
 evilbutton.TextScaled = true
 
 local Workspace = game:GetService("Workspace")
+
+local config = {
+    radius = 50,
+    height = 100,
+    rotationSpeed = 10,
+    attractionStrength = 1000,
+}
+
+-- Save and load functions
+local function saveConfig()
+    local configStr = HttpService:JSONEncode(config)
+    writefile("SuperRingPartsConfig.txt", configStr)
+end
+
+local function loadConfig()
+    if isfile("SuperRingPartsConfig.txt") then
+        local configStr = readfile("SuperRingPartsConfig.txt")
+        config = HttpService:JSONDecode(configStr)
+    end
+end
+
+loadConfig()
 
 local Folder = Instance.new("Folder", Workspace)
 local Part = Instance.new("Part", Folder)
@@ -132,17 +159,12 @@ button.Activated:Connect(function()
     hrp.CanCollide = false
 	for _, obj in ipairs(workspace:GetDescendants()) do
 		if obj:IsA("BasePart") and not obj.Anchored then
+            obj.CanCollide = false
 			local pos = part.Position
-            local distance = (Vector3.new(pos.X, tornadoCenter.Y, pos.Z) - tornadoCenter).Magnitude
-            local angle = math.atan2(pos.Z - tornadoCenter.Z, pos.X - tornadoCenter.X)
-            local newAngle = angle + math.rad(config.rotationSpeed)
-            local targetPos = Vector3.new(
-                tornadoCenter.X + math.cos(newAngle) * math.min(config.radius, distance),
-                tornadoCenter.Y + (config.height * (math.abs(math.sin((pos.Y - tornadoCenter.Y) / config.height)))),
-                tornadoCenter.Z + math.sin(newAngle) * math.min(config.radius, distance)
-            )
             local directionToTarget = (targetPos - part.Position).unit
             part.Velocity = directionToTarget * config.attractionStrength
+            wait(0.25)
+            obj.CanCollide = true
 		end
 	end
     hrp.CanCollide = true
@@ -157,3 +179,11 @@ evilbutton.Activated:Connect(function()
 	end
     hrp.CanCollide = true
 end)
+
+
+StarterGui:SetCore("SendNotification", {
+    Title = "WARNING",
+    Text = "Only Unanchored parts button is server sided!",
+    Icon = content,
+    Duration = 10
+})
