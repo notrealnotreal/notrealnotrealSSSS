@@ -95,7 +95,7 @@ local Window = Rayfield:CreateWindow({
 local MainTab = Window:CreateTab("Main", 4483362458) 
 local GameTab = Window:CreateTab("Game", 4483362458)
 local FunTab = Window:CreateTab("Fun", 4483362458)
-local SlammyTab = Window:CreateTab("Slammy", 4483362458)
+local SlammyTab = Window:CreateTab("Slammy", 97956330326398)
 local whatever = Window:CreateTab("hi this was added cuz my friend requested it", 126824355195428)
 
 local sound = game:GetService("SoundService")
@@ -109,6 +109,7 @@ local humanoid = char:WaitForChild("Humanoid")
 local ExecutingEnemy = false
 local ExecutingOthers = false
 local ExecutingHusk = false
+
 local Enemy = "Bell"
 
 local function message(text)
@@ -131,6 +132,11 @@ end
 
 local function KillHusk(state)
     ExecutingHusk = state
+    sound()
+end
+
+local function KillOther(state)
+    ExecutingOthers = state
     sound()
 end
 
@@ -168,7 +174,7 @@ whatever:CreateButton({
 
 -- // MAIN TAB \\ --
 
-MainTab:CreateParagraph({Title = "WIP.", Content = "missing more features id wish to add, more things along the way like enemy spawning and others, keybind is P! huge thanks to Nexer with their old hub scripts and me sharing just a bit of them!"})
+MainTab:CreateParagraph({Title = "WIP.", Content = "Missing more features id wish to add, more things along the way like enemy spawning and others, keybind is P! huge thanks to Nexer with their old hub scripts and me sharing just a bit of them!"})
 
 local Button = MainTab:CreateButton({
     Name = "Infinite Yield",
@@ -195,7 +201,7 @@ GameTab:CreateToggle({
     Name = "Kills Void Implosions and possibly others when the game starts",
     CurrentValue = false,
     Flag = "ExecuteOthers",
-    Callback = KillOthers
+    Callback = KillOther
 })
 
 GameTab:CreateToggle({
@@ -319,7 +325,7 @@ FunTab:CreateButton({
 
 FunTab:CreateButton({Name = "Unlock Reset Button (Resets)"; Callback = function()
 game.StarterGui:SetCore("ResetButtonCallback", true)
-LocalPlayer.PlayerGui.DISABLERESET.Enabled = false
+plr.PlayerGui.DISABLERESET.Enabled = false
 end; })
 
 
@@ -339,14 +345,14 @@ if ExecutingEnemy == true then
             pcall(function() v:Destroy() end)
         end
     end
-    for i, v in pairs(workspace.Bullet:GetDescendants()) do
+    for i, v in pairs(workspace.Item_Pools.Bullet:GetDescendants()) do
       v:Destroy()
     end
-    for i, v in pairs(workspace.LaserBullet:GetDescendants()) do
+    for i, v in pairs(workspace.Item_Pools.LaserBullet:GetDescendants()) do
       v:Destroy()
     end
 end
-if ExecutingEnemy == false and ExecutingHusuk == true then
+if ExecutingEnemy == false and ExecutingHusk == true then
    pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
 end
 if game.Workspace:FindFirstChild("WawawaCode") then
