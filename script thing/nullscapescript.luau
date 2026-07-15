@@ -1,7 +1,3 @@
---```lua
-
--- PASTEBIN CODE: NULLSCAPEBOII6769
-
 local hint = Instance.new("Hint")
 local message = Instance.new("Message")
 local placeId = game.PlaceId
@@ -11,7 +7,7 @@ if placeId == 100588763114828 then
     hint.Text = "Loading script."
 else
    message.Parent = workspace
-   message.Text = "You are not currently in the game place or you are not playing nullscape, please enter a game inside of nullscape to be able to use this script."
+   message.Text = "You are not currently in the game place of nullscape, please enter a game inside of nullscape to be able to use this script."
    wait(10)
    pcall(function() message:Destroy() end)
    return 
@@ -23,7 +19,7 @@ local Window = Rayfield:CreateWindow({
    Name = "le nullscape ui boiii",
    Icon = 114293255506804, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "nullscape",
-   LoadingSubtitle = "by whoever idk you aks me bro",
+   LoadingSubtitle = "by whoever idk you ask me bro",
    ShowText = "NullscapeUi", -- for mobile users to unhide rayfield, change if you'd like
    Theme = {
     TextColor = Color3.fromRGB(240, 240, 240),
@@ -92,14 +88,15 @@ local Window = Rayfield:CreateWindow({
       FileName = "Nullestion", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
       SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
       GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"Yes", "yes", "yEs", "yeS", "YEs", "yES", "YES", "uber secret code that nobody will find out gulp", "throzyckd", "67"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+      Key = {"Yes", "yes", "yEs", "yeS", "YEs", "yES", "YES", "uber secret code that nobody will find out gulp", "throzyckd", "67", "slammy"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
    }
 })
 
-local MainTab = Window:CreateTab("Main", 4483362458) -- Title, Image
-local GameTab = Window:CreateTab("Game", 4483362458) -- Title, Image
-local FunTab = Window:CreateTab("Fun", 4483362458) -- Title, Image
-local whatever = Window:CreateTab("hi this was added cuz my friend requested it", 126824355195428) -- Title, Image
+local MainTab = Window:CreateTab("Main", 4483362458) 
+local GameTab = Window:CreateTab("Game", 4483362458)
+local FunTab = Window:CreateTab("Fun", 4483362458)
+local SlammyTab = Window:CreateTab("Slammy", 4483362458)
+local whatever = Window:CreateTab("hi this was added cuz my friend requested it", 126824355195428)
 
 local sound = game:GetService("SoundService")
 local sfxfolder = sound.SFXFolder
@@ -110,6 +107,7 @@ local hrp = char.HumanoidRootPart
 local humanoid = char:WaitForChild("Humanoid")
 
 local ExecutingEnemy = false
+local ExecutingOthers = false
 local ExecutingHusk = false
 local Enemy = "Bell"
 
@@ -184,17 +182,24 @@ MainTab:CreateParagraph({Title = "", Content = "It's recommended to use yields l
 
 -- // GAME TAB \\ --
 
-GameTab:CreateParagraph({Title = "ENEMY KILLER INFO", Content = "Does not kill Guardians and Voidbound Guardians since they are server sided! This will also affect spawned enemies!"})
+GameTab:CreateParagraph({Title = "ENEMY KILLER INFO", Content = "This will also affect spawned enemies!"})
 
 GameTab:CreateToggle({
-    Name = "Kill enemies when game starts",
+    Name = "Kill enemies when the game starts",
     CurrentValue = false,
     Flag = "ExecuteEnemy",
     Callback = KillEnemy
 })
 
 GameTab:CreateToggle({
-    Name = "Kill husks when game starts",
+    Name = "Kills Void Implosions and possibly others when the game starts",
+    CurrentValue = false,
+    Flag = "ExecuteOthers",
+    Callback = KillOthers
+})
+
+GameTab:CreateToggle({
+    Name = "Kill husks when the game starts",
     CurrentValue = false,
     Flag = "ExecuteHusk",
     Callback = KillHusk
@@ -217,6 +222,21 @@ Enemy = Value
 end;})
 
 GameTab:CreateButton({
+    Name = "Tripmine ESP",
+    CurrentValue = false,
+    Flag = "TRIPMINEESPHELLIMYOURNEGIBHORUGFGODODOODODODOS",
+    Callback = function()
+        local tripminething = workspace.Item_Pools.Tripmine
+        local highlight = Instance.new("Highlight")
+        highlight.Parent = workspace
+        highlight.FillColor = "255, 0, 0"
+        highlight.OutlineColor = "255, 0, 0"
+        highlight.FillTransparency = 0
+        sound()
+    end,
+})
+
+GameTab:CreateButton({
     Name = "Clear all Enemies",
     CurrentValue = false,
     Flag = "ClearEnemies",
@@ -232,6 +252,10 @@ GameTab:CreateButton({
     CurrentValue = false,
     Flag = "AntiVoid",
     Callback = function()
+    if workspace:FindFirstChild('AntiVoid') then
+       message("AntiVoid already exists.")
+       return
+    end
         local antivoidtpplace = "Center of the Map"
         local a = workspace.KillVoid:Clone()
         a.Position = workspace.KillVoid.Position + Vector3.new(0,20,0)
@@ -239,24 +263,48 @@ GameTab:CreateButton({
         pcall(function() a.TouchInterest:Destroy() end)
         pcall(function() a:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
         task.wait()
-        a.CanCollide = false
+        a.CanCollide = true
         a.Transparency = 1
         a.Name = "AntiVoid"
         a.Parent = workspace    
         end,
 })
 
+--[[
+-- wip
+GameTab:CreateButton({
+    Name = "Fake Count Patch",
+    CurrentValue = false,
+    Flag = "FAKECOUNT",
+    Callback = function()
+        local TripmineCounter = game.ReplicatedStorage.GiftCounters
+        local button = Instance.new("TextButton")
+        button.Size = UDim2.new(0, 200, 0, 50)
+        button.Position = UDim2.new(0.5, -100, 0.9, -25)
+        button.Text = "" .. TripmineCounter.Gift:
+        button.Parent = gui
+        button.TextScaled = true
+    end,
+})
+
+]]
+
 GameTab:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
+if workspace:FindFirstChild('WawawaCode') then
+    pcall(function() workspace:FindFirstChild('WawawaCode'):Destroy() end)
+    return
+end
 local newpart = Instance.new("Part")
 newpart.Name = "WawawaCode"
 newpart.Anchored = true
 newpart.Parent = workspace
 end; })
 
+--[[
 GameTab:CreateSlider({Name = "FOV"; Range = {0,360}; Increment = 1; Suffix = ""; CurrentValue = workspace.CurrentCamera.FieldOfView; Callback = function(Value)
 workspace.CurrentCamera.FieldOfView = Value
 end; })
-
+]]
 
 -- // FUN TAB \\ --
 --[[
@@ -269,8 +317,9 @@ FunTab:CreateButton({
 })
 ]]
 
-FunTab:CreateButton({Name = "Unlock Reset Button"; Callback = function()
+FunTab:CreateButton({Name = "Unlock Reset Button (Resets)"; Callback = function()
 game.StarterGui:SetCore("ResetButtonCallback", true)
+LocalPlayer.PlayerGui.DISABLERESET.Enabled = false
 end; })
 
 
@@ -290,6 +339,12 @@ if ExecutingEnemy == true then
             pcall(function() v:Destroy() end)
         end
     end
+    for i, v in pairs(workspace.Bullet:GetDescendants()) do
+      v:Destroy()
+    end
+    for i, v in pairs(workspace.LaserBullet:GetDescendants()) do
+      v:Destroy()
+    end
 end
 if ExecutingEnemy == false and ExecutingHusuk == true then
    pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
@@ -304,4 +359,3 @@ end
 
 wait(0.05)
 end
---```
