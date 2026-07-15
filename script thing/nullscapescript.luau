@@ -338,18 +338,32 @@ end)
 hint:Destroy()
 while true do
 if ExecutingEnemy == true then
-    for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetChildren()) do
-        if v.Name == "Guardian" or v.Name == "ShadowGuardian" then
-            
-        else
-            pcall(function() v:Destroy() end)
-        end
+    for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetDescendants()) do
+        pcall(function() v:Destroy() end)
     end
     for i, v in pairs(workspace.Item_Pools.Bullet:GetDescendants()) do
-      v:Destroy()
+       pcall(function() v:Destroy() end)
     end
     for i, v in pairs(workspace.Item_Pools.LaserBullet:GetDescendants()) do
-      v:Destroy()
+       pcall(function() v:Destroy() end)
+    end
+    for i, v in pairs(workspace.Item_Pools.LockIn:GetDescendants()) do
+       pcall(function() v:Destroy() end)
+    end
+    for i, v in pairs(workspace.Item_Pools.Homer:GetDescendants()) do
+       pcall(function() v:Destroy() end)
+    end
+    for i, v in pairs(workspace.Item_Pools.HomerInverted:GetDescendants()) do
+       pcall(function() v:Destroy() end)
+    end
+    for i, v in pairs(workspace.Item_Pools.HomerLaser:GetDescendants()) do
+       pcall(function() v:Destroy() end)
+    end
+    for i, v in pairs(workspace.Item_Pools.RoarBullet:GetDescendants()) do
+       pcall(function() v:Destroy() end)
+    end
+    for i, v in pairs(workspace.Item_Pools.OldHomer:GetDescendants()) do
+       pcall(function() v:Destroy() end)
     end
 end
 if ExecutingEnemy == false and ExecutingHusk == true then
