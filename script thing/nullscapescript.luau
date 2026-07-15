@@ -229,8 +229,8 @@ GameTab:CreateButton({
         local tripminething = workspace.Item_Pools.Tripmine
         local highlight = Instance.new("Highlight")
         highlight.Parent = tripminething
-        highlight.FillColor = "255, 0, 0"
-        highlight.OutlineColor = "255, 0, 0"
+        highlight.FillColor = Color3.new(255, 0, 0)
+        highlight.OutlineColor = Color3.new(255, 0, 0)
         highlight.FillTransparency = 0
         sound()
     end,
