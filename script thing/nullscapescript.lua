@@ -75,7 +75,7 @@ local Window = Rayfield:CreateWindow({
    },
  
    Discord = {
-      Enabled = true, -- Prompt the user to join your Discord server if their executor supports it
+      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
       Invite = "https://discord.gg/dKrbYz3g4h", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
       RememberJoins = true -- Set this to false to make them join the discord every time they load it up
    },
@@ -149,8 +149,8 @@ local function KillEnemy(state)
     ExecutingEnemy = state
     sound()
 
-    if deletefolder:FindFirstChild("ddkkkdkdkdkdkd")
-        for i, v in pairs(deletefolder) do
+    if deletefolder:FindFirstChild("ddkkkdkdkdkdkd") then
+        for i, v in ipairs(deletefolder:GetChildren()) do
            if not v.Name == "ddkkkdkdkdkdkd" then
               v.Parent = workspace.Item_Pools
            end 
@@ -195,6 +195,8 @@ whatever:CreateButton({
 -- // MAIN TAB \\ --
 
 MainTab:CreateParagraph({Title = "WIP", Content = "Missing more features i'd wish to add, more things along the way, keybind is P! huge thanks to Nexer with their old hub scripts and me sharing just a bit of them!"})
+MainTab:CreateParagraph({Title = "Server", Content = "https://discord.gg/dKrbYz3g4h"})
+
 
 local Button = MainTab:CreateButton({
     Name = "Infinite Yield",
