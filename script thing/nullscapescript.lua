@@ -150,22 +150,21 @@ local function KillEnemy(state)
     sound()
 
     if deletefolder:FindFirstChild("ddkkkdkdkdkdkd") then
+        deletefolder:FindFirstChild("ddkkkdkdkdkdkd"):Destroy()
         for i, v in ipairs(deletefolder:GetChildren()) do
-           if not v.Name == "ddkkkdkdkdkdkd" then
-              v.Parent = workspace.Item_Pools
-           end 
+            v.Parent = workspace.Item_Pools
         end
 
     else
         checker.Parent = deletefolder
-        tempdetele(workspace.Item_Pools.Bullet)
-        tempdetele(workspace.Item_Pools.LaserBullet)
-        tempdetele(workspace.Item_Pools.LockIn)
-        tempdetele(workspace.Item_Pools.Homer)
-        tempdetele(workspace.Item_Pools.HomerInverted)
-        tempdetele(workspace.Item_Pools.HomerLaser)
-        tempdetele(workspace.Item_Pools.RoarBullet)
-        tempdetele(workspace.Item_Pools.OldHomer)
+workspace.Item_Pools.Bullet.Parent = deletefolder
+workspace.Item_Pools.LaserBullet.Parent = deletefolder
+workspace.Item_Pools.LockIn.Parent = deletefolder
+workspace.Item_Pools.Homer.Parent = deletefolder
+workspace.Item_Pools.HomerInverted.Parent = deletefolder
+workspace.Item_Pools.HomerLaser.Parent = deletefolder
+workspace.Item_Pools.RoarBullet.Parent = deletefolder
+workspace.Item_Pools.OldHomer.Parent = deletefolder
     end
 end
 
@@ -253,6 +252,7 @@ GameTab:CreateButton({
     CurrentValue = false,
     Flag = "ClearEnemies",
     Callback = function()
+        sound()
         for i, v in pairs(game.Workspace:FindFirstChild("Enemies"):GetChildren()) do
             pcall(function() v:Destroy() end)
         end
@@ -264,6 +264,7 @@ GameTab:CreateButton({
     CurrentValue = false,
     Flag = "AntiVoid",
     Callback = function()
+    sound()
     if workspace:FindFirstChild('AntiVoid') then
        message("AntiVoid already exists.")
        return
@@ -282,25 +283,6 @@ GameTab:CreateButton({
         end,
 })
 
---[[
--- wip
-GameTab:CreateButton({
-    Name = "Fake Count Patch",
-    CurrentValue = false,
-    Flag = "FAKECOUNT",
-    Callback = function()
-        local TripmineCounter = game.ReplicatedStorage.GiftCounters
-        local button = Instance.new("TextButton")
-        button.Size = UDim2.new(0, 200, 0, 50)
-        button.Position = UDim2.new(0.5, -100, 0.9, -25)
-        button.Text = "" .. TripmineCounter.Gift:
-        button.Parent = gui
-        button.TextScaled = true
-    end,
-})
-
-]]
-
 GameTab:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
 if workspace:FindFirstChild('WawawaCode') then
     pcall(function() workspace:FindFirstChild('WawawaCode'):Destroy() end)
@@ -311,12 +293,6 @@ newpart.Name = "WawawaCode"
 newpart.Anchored = true
 newpart.Parent = statusfolder
 end; })
-
---[[
-GameTab:CreateSlider({Name = "FOV"; Range = {0,360}; Increment = 1; Suffix = ""; CurrentValue = workspace.CurrentCamera.FieldOfView; Callback = function(Value)
-workspace.CurrentCamera.FieldOfView = Value
-end; })
-]]
 
 -- // ENEMY TAB \\ --
 
@@ -355,24 +331,11 @@ EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersO
 Enemy = Value
 end;})
 
--- // FUN TAB \\ --
---[[
-FunTab:CreateButton({
-    Name = "Pull Unanchored Parts button.",
-    CurrentValue = false,
-    Flag = "PullPartsButton",
-    Callback = function()
-    end,
-})
-]]
-
 FunTab:CreateButton({Name = "Unlock Reset Button (Resets)"; Callback = function()
 game.StarterGui:SetCore("ResetButtonCallback", true)
 plr.PlayerGui.DISABLERESET.Enabled = false
 end; })
 
-
--- on hold for rework
 task.spawn(function()
     sfxfolder.NewLevel:Play()
     message("PLEASE DO NOT RUN THIS SCRIPT MORE THAN TWICE, THINGS MAY BREAK!")
@@ -384,32 +347,6 @@ if ExecutingEnemy == true then
     for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetDescendants()) do
         pcall(function() v:Destroy() end)
     end
-    --[[
-    for i, v in pairs(workspace.Item_Pools.Bullet:GetDescendants()) do
-       pcall(function() v:Destroy() end)
-    end
-    for i, v in pairs(workspace.Item_Pools.LaserBullet:GetDescendants()) do
-       pcall(function() v:Destroy() end)
-    end
-    for i, v in pairs(workspace.Item_Pools.LockIn:GetDescendants()) do
-       pcall(function() v:Destroy() end)
-    end
-    for i, v in pairs(workspace.Item_Pools.Homer:GetDescendants()) do
-       pcall(function() v:Destroy() end)
-    end
-    for i, v in pairs(workspace.Item_Pools.HomerInverted:GetDescendants()) do
-       pcall(function() v:Destroy() end)
-    end
-    for i, v in pairs(workspace.Item_Pools.HomerLaser:GetDescendants()) do
-       pcall(function() v:Destroy() end)
-    end
-    for i, v in pairs(workspace.Item_Pools.RoarBullet:GetDescendants()) do
-       pcall(function() v:Destroy() end)
-    end
-    for i, v in pairs(workspace.Item_Pools.OldHomer:GetDescendants()) do
-       pcall(function() v:Destroy() end)
-    end
-    ]]
 end
 if ExecutingEnemy == false and ExecutingHusk == true then
    pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
