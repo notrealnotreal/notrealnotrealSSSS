@@ -16,7 +16,7 @@ end
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "le nullscape ui boiii",
+   Name = "le nullhub ui boiii",
    Icon = 114293255506804, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "nullscape",
    LoadingSubtitle = "by whoever idk you ask me bro",
@@ -75,8 +75,8 @@ local Window = Rayfield:CreateWindow({
    },
  
    Discord = {
-      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
-      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
+      Enabled = true, -- Prompt the user to join your Discord server if their executor supports it
+      Invite = "https://discord.gg/dKrbYz3g4h", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
       RememberJoins = true -- Set this to false to make them join the discord every time they load it up
    },
  
@@ -94,17 +94,32 @@ local Window = Rayfield:CreateWindow({
 
 local MainTab = Window:CreateTab("Main", 4483362458) 
 local GameTab = Window:CreateTab("Game", 4483362458)
+local EnemyTab = Window:CreateTab("Enemy Spawner", 4483362458)
 local FunTab = Window:CreateTab("Fun", 4483362458)
 local SlammyTab = Window:CreateTab("Slammy", 97956330326398)
 local whatever = Window:CreateTab("hi this was added cuz my friend requested it", 126824355195428)
 
 local sound = game:GetService("SoundService")
 local sfxfolder = sound.SFXFolder
+local deletefolder = Instance.new("Folder")
+local statusfolder = Instance.new("Folder")
+statusfolder.Name = "NULLHUBSTT"
+deletefolder.Name = "Deleted"
 
 local plr = game.Players.LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
 local hrp = char.HumanoidRootPart
 local humanoid = char:WaitForChild("Humanoid")
+
+if plr:FindFirstChild("Deleted") then
+    pcall(function() plr:FindFirstChild("Deleted"):Destroy() end)
+end
+
+if plr:FindFirstChild("NULLHUBSTT") then
+    pcall(function() plr:FindFirstChild("NULLHUBSTT"):Destroy() end)
+end
+
+deletefolder.Parent = plr
 
 local ExecutingEnemy = false
 local ExecutingOthers = false
@@ -120,14 +135,38 @@ local function message(text)
    pcall(function() message:Destroy() end)
 end
 
+local function tempdelete(child)
+   child.Parent = deletefolder
+end
 
 local function sound()
     sfxfolder.PlayerDeath:Play()
 end
 
 local function KillEnemy(state)
+    local checker = Instance.new("Part")
+    checker.Name = "ddkkkdkdkdkdkd"
     ExecutingEnemy = state
     sound()
+
+    if deletefolder:FindFirstChild("ddkkkdkdkdkdkd")
+        for i, v in pairs(deletefolder) do
+           if not v.Name == "ddkkkdkdkdkdkd" then
+              v.Parent = workspace.Item_Pools
+           end 
+        end
+
+    else
+        checker.Parent = deletefolder
+        tempdetele(workspace.Item_Pools.Bullet)
+        tempdetele(workspace.Item_Pools.LaserBullet)
+        tempdetele(workspace.Item_Pools.LockIn)
+        tempdetele(workspace.Item_Pools.Homer)
+        tempdetele(workspace.Item_Pools.HomerInverted)
+        tempdetele(workspace.Item_Pools.HomerLaser)
+        tempdetele(workspace.Item_Pools.RoarBullet)
+        tempdetele(workspace.Item_Pools.OldHomer)
+    end
 end
 
 local function KillHusk(state)
@@ -138,25 +177,6 @@ end
 local function KillOther(state)
     ExecutingOthers = state
     sound()
-end
-
-local function spawnEnemy(Enemy)
-   local enemylist = game.ReplicatedStorage.EnemyFolder.Enemies
-   local selectedEnemy = enemylist:FindFirstChild(Enemy)
-   print("this and that")
-   if selectedEnemy then
-       local cloneselected = selectedEnemy:Clone()
-        for _, obj in ipairs(cloneselected:GetDescendants()) do
-	        if obj:IsA("Script") or obj:IsA("LocalScript") then
-		        obj.Enabled = true
-	        end
-        end
-       cloneselected.Parent = workspace.Enemies
-       cloneselected.Position = hrp.Position + Vector3.new(0, 10, 0)
-       message("Spawned enemy " .. cloneselected.Name .. " into enemy files.")
-   else
-       message("Could not find enemy.")
-   end
 end
 
 
@@ -174,7 +194,7 @@ whatever:CreateButton({
 
 -- // MAIN TAB \\ --
 
-MainTab:CreateParagraph({Title = "WIP.", Content = "Missing more features id wish to add, more things along the way like enemy spawning and others, keybind is P! huge thanks to Nexer with their old hub scripts and me sharing just a bit of them!"})
+MainTab:CreateParagraph({Title = "WIP", Content = "Missing more features i'd wish to add, more things along the way, keybind is P! huge thanks to Nexer with their old hub scripts and me sharing just a bit of them!"})
 
 local Button = MainTab:CreateButton({
     Name = "Infinite Yield",
@@ -210,22 +230,6 @@ GameTab:CreateToggle({
     Flag = "ExecuteHusk",
     Callback = KillHusk
 })
-
-GameTab:CreateParagraph({Title = "ENEMY SPAWNER INFO", Content = "(Remember it's all client sided!) Heres a list of all enemies you can summon currently: Baby, Bell, Cadence, Flesh, Fleshling, Guardian, ICBM, Kolona, Mart, Oblivion, Operator, Ponderer, Quartz, Random, Scrapmaw, ShadowBaby, ShadowBabyConcept, ShadowGuardian, Sigil, Skinwalker, Slicer, Springer, Telefragger, Voidbreaker, nilEnemy, Nilmirage"})
-
-GameTab:CreateButton({
-    Name = "Spawn enemy put from 'Selected Enemy' box.",
-    CurrentValue = false,
-    Flag = "SpawnEnemy",
-    Callback = function()
-        sound()
-        spawnEnemy(Enemy)
-    end,
-})
-
-GameTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
-Enemy = Value
-end;})
 
 GameTab:CreateButton({
     Name = "Tripmine ESP",
@@ -303,7 +307,7 @@ end
 local newpart = Instance.new("Part")
 newpart.Name = "WawawaCode"
 newpart.Anchored = true
-newpart.Parent = workspace
+newpart.Parent = statusfolder
 end; })
 
 --[[
@@ -311,6 +315,43 @@ GameTab:CreateSlider({Name = "FOV"; Range = {0,360}; Increment = 1; Suffix = "";
 workspace.CurrentCamera.FieldOfView = Value
 end; })
 ]]
+
+-- // ENEMY TAB \\ --
+
+local function spawnEnemy(Enemy)
+   local enemylist = game.ReplicatedStorage.EnemyFolder.Enemies
+   local selectedEnemy = enemylist:FindFirstChild(Enemy)
+   print("this and that")
+   if selectedEnemy then
+       local cloneselected = selectedEnemy:Clone()
+        for _, obj in ipairs(cloneselected:GetDescendants()) do
+	        if obj:IsA("Script") or obj:IsA("LocalScript") then
+		        obj.Enabled = true
+	        end
+        end
+       cloneselected.Parent = workspace.Enemies
+       cloneselected.Position = hrp.Position + Vector3.new(0, 10, 0)
+       message("Spawned enemy " .. cloneselected.Name .. " into enemy files.")
+   else
+       message("Could not find enemy.")
+   end
+end
+
+EnemyTab:CreateParagraph({Title = "ENEMY SPAWNER INFO", Content = "(Remember it's all client sided!) Heres a list of all enemies you can summon currently: Baby, Bell, Cadence, Flesh, Fleshling, Guardian, ICBM, Kolona, Mart, Oblivion, Operator, Ponderer, Quartz, Random, Scrapmaw, ShadowBaby, ShadowBabyConcept, ShadowGuardian, Sigil, Skinwalker, Slicer, Springer, Telefragger, Voidbreaker, nilEnemy, Nilmirage"})
+
+EnemyTab:CreateButton({
+    Name = "Spawn enemy put from 'Selected Enemy' box.",
+    CurrentValue = false,
+    Flag = "SpawnEnemy",
+    Callback = function()
+        sound()
+        spawnEnemy(Enemy)
+    end,
+})
+
+EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
+Enemy = Value
+end;})
 
 -- // FUN TAB \\ --
 --[[
@@ -341,6 +382,7 @@ if ExecutingEnemy == true then
     for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetDescendants()) do
         pcall(function() v:Destroy() end)
     end
+    --[[
     for i, v in pairs(workspace.Item_Pools.Bullet:GetDescendants()) do
        pcall(function() v:Destroy() end)
     end
@@ -365,6 +407,7 @@ if ExecutingEnemy == true then
     for i, v in pairs(workspace.Item_Pools.OldHomer:GetDescendants()) do
        pcall(function() v:Destroy() end)
     end
+    ]]
 end
 if ExecutingEnemy == false and ExecutingHusk == true then
    pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
