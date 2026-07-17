@@ -19,7 +19,7 @@ local Window = Rayfield:CreateWindow({
    Name = "le nullhub ui boiii",
    Icon = 114293255506804, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "nullscape",
-   LoadingSubtitle = "by whoever idk you ask me bro",
+   LoadingSubtitle = "by nottreal",
    ShowText = "NullscapeUi", -- for mobile users to unhide rayfield, change if you'd like
    Theme = {
     TextColor = Color3.fromRGB(240, 240, 240),
@@ -240,8 +240,8 @@ GameTab:CreateButton({
         local tripminething = workspace.Item_Pools.Tripmine
         local highlight = Instance.new("Highlight")
         highlight.Parent = tripminething
-        highlight.FillColor = Color3.new(255, 0, 0)
-        highlight.OutlineColor = Color3.new(255, 0, 0)
+        highlight.FillColor = Color3.new(0, 255, 0)
+        highlight.OutlineColor = Color3.new(0, 255, 0)
         highlight.FillTransparency = 0
         sound()
     end,
@@ -256,6 +256,20 @@ GameTab:CreateButton({
         for i, v in pairs(game.Workspace:FindFirstChild("Enemies"):GetChildren()) do
             pcall(function() v:Destroy() end)
         end
+    end,
+})
+
+GameTab:CreateButton({
+    Name = "Remove Bells Effect",
+    CurrentValue = false,
+    Flag = "CLEARBELLLLL",
+    Callback = function()
+        sound()
+        game.Lighting.Blur.Enabled = false
+        game.Lighting.Bloom.Enabled = false
+        game.Lighting.ColorCorrection.Enabled = false
+        game.Lighting.Flash.Enabled = false
+        game.Lighting.Gamma.Enabled = false
     end,
 })
 
@@ -294,6 +308,7 @@ newpart.Anchored = true
 newpart.Parent = statusfolder
 end; })
 
+
 -- // ENEMY TAB \\ --
 
 local function spawnEnemy(Enemy)
@@ -331,10 +346,13 @@ EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersO
 Enemy = Value
 end;})
 
+-- // FUN TAB \\ --
+
 FunTab:CreateButton({Name = "Unlock Reset Button (Resets)"; Callback = function()
 game.StarterGui:SetCore("ResetButtonCallback", true)
 plr.PlayerGui.DISABLERESET.Enabled = false
 end; })
+
 
 task.spawn(function()
     sfxfolder.NewLevel:Play()
