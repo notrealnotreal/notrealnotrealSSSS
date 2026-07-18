@@ -285,7 +285,7 @@ GameTab:CreateButton({
     end
         local antivoidtpplace = "Center of the Map"
         local a = workspace.KillVoid:Clone()
-        a.Position = workspace.KillVoid.Position + Vector3.new(0,20,0)
+        a.Position = workspace.KillVoid.Position + Vector3.new(0, 100, 0)
         a.CanTouch = false
         pcall(function() a.TouchInterest:Destroy() end)
         pcall(function() a:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
