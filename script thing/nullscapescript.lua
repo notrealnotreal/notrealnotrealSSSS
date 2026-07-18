@@ -144,28 +144,23 @@ local function sound()
 end
 
 local function KillEnemy(state)
-    local checker = Instance.new("Part")
-    checker.Name = "ddkkkdkdkdkdkd"
     ExecutingEnemy = state
     sound()
-
-    if deletefolder:FindFirstChild("ddkkkdkdkdkdkd") then
-        deletefolder:FindFirstChild("ddkkkdkdkdkdkd"):Destroy()
-        for i, v in ipairs(deletefolder:GetChildren()) do
-            v.Parent = workspace.Item_Pools
-        end
-
-    else
-        checker.Parent = deletefolder
-workspace.Item_Pools.Bullet.Parent = deletefolder
-workspace.Item_Pools.LaserBullet.Parent = deletefolder
-workspace.Item_Pools.LockIn.Parent = deletefolder
-workspace.Item_Pools.Homer.Parent = deletefolder
-workspace.Item_Pools.HomerInverted.Parent = deletefolder
-workspace.Item_Pools.HomerLaser.Parent = deletefolder
-workspace.Item_Pools.RoarBullet.Parent = deletefolder
-workspace.Item_Pools.OldHomer.Parent = deletefolder
-    end
+if statusfolder:FindFirstChild("ddkkkdkdkdkdkd") then
+    message("Guardians bullets will remain gone.")
+else
+	local checker = Instance.new("Part")
+    checker.Name = "ddkkkdkdkdkdkd"
+    checker.Parent = statusfolder
+	pcall(function() workspace.Item_Pools.Bullet:Destroy() end)
+	pcall(function() workspace.Item_Pools.LaserBullet:Destroy() end)
+	pcall(function() workspace.Item_Pools.LockIn:Destroy() end)
+	pcall(function() workspace.Item_Pools.Homer:Destroy() end)
+	pcall(function() workspace.Item_Pools.HomerInverted:Destroy() end)
+	pcall(function() workspace.Item_Pools.HomerLaser:Destroy() end)
+	pcall(function() workspace.Item_Pools.RoarBullet:Destroy() end)
+	pcall(function() workspace.Item_Pools.OldHomer:Destroy() end)
+end
 end
 
 local function KillHusk(state)
