@@ -298,8 +298,8 @@ GameTab:CreateButton({
 })
 
 GameTab:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
-if workspace:FindFirstChild('WawawaCode') then
-    pcall(function() workspace:FindFirstChild('WawawaCode'):Destroy() end)
+if statusfolder:FindFirstChild('WawawaCode') then
+    pcall(function() statusfolder:FindFirstChild('WawawaCode'):Destroy() end)
     return
 end
 local newpart = Instance.new("Part")
@@ -369,7 +369,7 @@ end
 if ExecutingEnemy == false and ExecutingHusk == true then
    pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
 end
-if game.Workspace:FindFirstChild("WawawaCode") then
+if statusfolder:FindFirstChild("WawawaCode") then
 for _,c in next, workspace.CurrentRooms:GetDescendants() do
 if c:IsA("BasePart") and c.Material==Enum.Material.Ice then
 c.Material=Enum.Material.Plastic
