@@ -144,31 +144,8 @@ local function sound()
 end
 
 local function KillEnemy(state)
-    local checker = Instance.new("Part")
-    local failsafe = Instance.new("Part")
-    checker.Name = "ddkkkdkdkdkdkd"
-    failsafe.Name = "hiimmenandimthecoolfailsasve"
     ExecutingEnemy = state
     sound()
-
-    if deletefolder:FindFirstChild("ddkkkdkdkdkdkd") then
-        message("sadly due to issues guardians/voidbound guardians bullets will remain deleted")
-    else
-        if plr:FindFirstChild("hiimmenandimthecoolfailsasve") then
-            message("fail safed")
-        else
-        failsafe.Parent = plr
-        checker.Parent = deletefolder
-        pcall(function() workspace.Item_Pools.Bullet:Destroy() end)
-        pcall(function() workspace.Item_Pools.LaserBullet:Destroy() end)
-        pcall(function() workspace.Item_Pools.LockIn:Destroy() end)
-        pcall(function() workspace.Item_Pools.Homer:Destroy() end)
-        pcall(function() workspace.Item_Pools.HomerInverted:Destroy() end)
-        pcall(function() workspace.Item_Pools.HomerLaser:Destroy() end)
-        pcall(function() workspace.Item_Pools.RoarBullet:Destroy() end) 
-        pcall(function() workspace.Item_Pools.OldHomer:Destroy() end)
-        end
-    end
 end
 
 local function KillHusk(state)
@@ -212,7 +189,7 @@ MainTab:CreateParagraph({Title = "", Content = "It's recommended to use yields l
 
 -- // GAME TAB \\ --
 
-GameTab:CreateParagraph({Title = "ENEMY KILLER INFO", Content = "This will also affect spawned enemies!"})
+GameTab:CreateParagraph({Title = "ENEMY KILLER INFO", Content = "You are still fragile to Guardian and Voidbound Guardian! This will also affect spawned enemies!"})
 
 GameTab:CreateToggle({
     Name = "Kill enemies when the game starts",
