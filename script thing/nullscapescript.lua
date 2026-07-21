@@ -150,21 +150,17 @@ local function KillEnemy(state)
     sound()
 
     if deletefolder:FindFirstChild("ddkkkdkdkdkdkd") then
-        deletefolder:FindFirstChild("ddkkkdkdkdkdkd"):Destroy()
-        for i, v in ipairs(deletefolder:GetChildren()) do
-            v.Parent = workspace.Item_Pools
-        end
-
+        message("sadly due to issues guardians/voidbound guardians bullets will remain deleted")
     else
         checker.Parent = deletefolder
-workspace.Item_Pools.Bullet.Parent = deletefolder
-workspace.Item_Pools.LaserBullet.Parent = deletefolder
-workspace.Item_Pools.LockIn.Parent = deletefolder
-workspace.Item_Pools.Homer.Parent = deletefolder
-workspace.Item_Pools.HomerInverted.Parent = deletefolder
-workspace.Item_Pools.HomerLaser.Parent = deletefolder
-workspace.Item_Pools.RoarBullet.Parent = deletefolder
-workspace.Item_Pools.OldHomer.Parent = deletefolder
+        pcall(function() workspace.Item_Pools.Bullet:Destroy() end)
+        pcall(function() workspace.Item_Pools.LaserBullet:Destroy() end)
+        pcall(function() workspace.Item_Pools.LockIn:Destroy() end)
+        pcall(function() workspace.Item_Pools.Homer:Destroy() end)
+        pcall(function() workspace.Item_Pools.HomerInverted:Destroy() end)
+        pcall(function() workspace.Item_Pools.HomerLaser:Destroy() end)
+        pcall(function() workspace.Item_Pools.RoarBullet:Destroy() end) 
+        pcall(function() workspace.Item_Pools.OldHomer:Destroy() end)
     end
 end
 
@@ -344,8 +340,6 @@ EnemyTab:CreateButton({
 EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 Enemy = Value
 end;})
-
--- // FUN TAB \\ --
 
 FunTab:CreateButton({Name = "Unlock Reset Button (Resets)"; Callback = function()
 game.StarterGui:SetCore("ResetButtonCallback", true)
