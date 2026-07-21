@@ -144,23 +144,28 @@ local function sound()
 end
 
 local function KillEnemy(state)
+    local checker = Instance.new("Part")
+    checker.Name = "ddkkkdkdkdkdkd"
     ExecutingEnemy = state
     sound()
-if statusfolder:FindFirstChild("ddkkkdkdkdkdkd") then
-    message("Guardians bullets will remain gone.")
-else
-	local checker = Instance.new("Part")
-    checker.Name = "ddkkkdkdkdkdkd"
-    checker.Parent = statusfolder
-	pcall(function() workspace.Item_Pools.Bullet:Destroy() end)
-	pcall(function() workspace.Item_Pools.LaserBullet:Destroy() end)
-	pcall(function() workspace.Item_Pools.LockIn:Destroy() end)
-	pcall(function() workspace.Item_Pools.Homer:Destroy() end)
-	pcall(function() workspace.Item_Pools.HomerInverted:Destroy() end)
-	pcall(function() workspace.Item_Pools.HomerLaser:Destroy() end)
-	pcall(function() workspace.Item_Pools.RoarBullet:Destroy() end)
-	pcall(function() workspace.Item_Pools.OldHomer:Destroy() end)
-end
+
+    if deletefolder:FindFirstChild("ddkkkdkdkdkdkd") then
+        deletefolder:FindFirstChild("ddkkkdkdkdkdkd"):Destroy()
+        for i, v in ipairs(deletefolder:GetChildren()) do
+            v.Parent = workspace.Item_Pools
+        end
+
+    else
+        checker.Parent = deletefolder
+workspace.Item_Pools.Bullet.Parent = deletefolder
+workspace.Item_Pools.LaserBullet.Parent = deletefolder
+workspace.Item_Pools.LockIn.Parent = deletefolder
+workspace.Item_Pools.Homer.Parent = deletefolder
+workspace.Item_Pools.HomerInverted.Parent = deletefolder
+workspace.Item_Pools.HomerLaser.Parent = deletefolder
+workspace.Item_Pools.RoarBullet.Parent = deletefolder
+workspace.Item_Pools.OldHomer.Parent = deletefolder
+    end
 end
 
 local function KillHusk(state)
@@ -280,7 +285,7 @@ GameTab:CreateButton({
     end
         local antivoidtpplace = "Center of the Map"
         local a = workspace.KillVoid:Clone()
-        a.Position = workspace.KillVoid.Position + Vector3.new(0, 100, 0)
+        a.Position = workspace.KillVoid.Position + Vector3.new(0,20,0)
         a.CanTouch = false
         pcall(function() a.TouchInterest:Destroy() end)
         pcall(function() a:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
@@ -293,8 +298,8 @@ GameTab:CreateButton({
 })
 
 GameTab:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
-if statusfolder:FindFirstChild('WawawaCode') then
-    pcall(function() statusfolder:FindFirstChild('WawawaCode'):Destroy() end)
+if workspace:FindFirstChild('WawawaCode') then
+    pcall(function() workspace:FindFirstChild('WawawaCode'):Destroy() end)
     return
 end
 local newpart = Instance.new("Part")
@@ -302,7 +307,6 @@ newpart.Name = "WawawaCode"
 newpart.Anchored = true
 newpart.Parent = statusfolder
 end; })
-
 
 -- // ENEMY TAB \\ --
 
@@ -341,14 +345,13 @@ EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersO
 Enemy = Value
 end;})
 
--- // FUN TAB \\ --
-
 FunTab:CreateButton({Name = "Unlock Reset Button (Resets)"; Callback = function()
 game.StarterGui:SetCore("ResetButtonCallback", true)
 plr.PlayerGui.DISABLERESET.Enabled = false
 end; })
 
 
+-- on hold for rework
 task.spawn(function()
     sfxfolder.NewLevel:Play()
     message("PLEASE DO NOT RUN THIS SCRIPT MORE THAN TWICE, THINGS MAY BREAK!")
@@ -357,14 +360,18 @@ end)
 hint:Destroy()
 while true do
 if ExecutingEnemy == true then
-    for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetDescendants()) do
-        pcall(function() v:Destroy() end)
+    for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetChildren()) do
+        if v.Name == "Guardian" or v.Name == "Voidbound Guardian" then
+            -- hi
+        else
+            pcall(function() v:Destroy() end)
+        end
     end
 end
 if ExecutingEnemy == false and ExecutingHusk == true then
    pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
 end
-if statusfolder:FindFirstChild("WawawaCode") then
+if game.Workspace:FindFirstChild("WawawaCode") then
 for _,c in next, workspace.CurrentRooms:GetDescendants() do
 if c:IsA("BasePart") and c.Material==Enum.Material.Ice then
 c.Material=Enum.Material.Plastic
