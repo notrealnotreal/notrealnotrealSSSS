@@ -144,14 +144,20 @@ local function sound()
 end
 
 local function KillEnemy(state)
-    local checker = Instance.new("Part")
+    local checker = Instance.new("Part")]
+    local failsafe = Instance.new("Part")
     checker.Name = "ddkkkdkdkdkdkd"
+    failsafe.Name = "hiimmenandimthecoolfailsasve"
     ExecutingEnemy = state
     sound()
 
     if deletefolder:FindFirstChild("ddkkkdkdkdkdkd") then
         message("sadly due to issues guardians/voidbound guardians bullets will remain deleted")
     else
+        if plr:FindFirstChild("hiimmenandimthecoolfailsasve") then
+            message("fail safed")
+        else
+        failsafe.Parent = plr
         checker.Parent = deletefolder
         pcall(function() workspace.Item_Pools.Bullet:Destroy() end)
         pcall(function() workspace.Item_Pools.LaserBullet:Destroy() end)
@@ -161,6 +167,7 @@ local function KillEnemy(state)
         pcall(function() workspace.Item_Pools.HomerLaser:Destroy() end)
         pcall(function() workspace.Item_Pools.RoarBullet:Destroy() end) 
         pcall(function() workspace.Item_Pools.OldHomer:Destroy() end)
+        end
     end
 end
 
@@ -340,6 +347,8 @@ EnemyTab:CreateButton({
 EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 Enemy = Value
 end;})
+
+-- // FUN TAB \\ --
 
 FunTab:CreateButton({Name = "Unlock Reset Button (Resets)"; Callback = function()
 game.StarterGui:SetCore("ResetButtonCallback", true)
