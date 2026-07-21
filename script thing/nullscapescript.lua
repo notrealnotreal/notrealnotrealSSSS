@@ -345,6 +345,8 @@ EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersO
 Enemy = Value
 end;})
 
+-- // FUN TAB \\ --
+
 FunTab:CreateButton({Name = "Unlock Reset Button (Resets)"; Callback = function()
 game.StarterGui:SetCore("ResetButtonCallback", true)
 plr.PlayerGui.DISABLERESET.Enabled = false
@@ -371,7 +373,7 @@ end
 if ExecutingEnemy == false and ExecutingHusk == true then
    pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
 end
-if game.Workspace:FindFirstChild("WawawaCode") then
+if statusfolder:FindFirstChild("WawawaCode") then
 for _,c in next, workspace.CurrentRooms:GetDescendants() do
 if c:IsA("BasePart") and c.Material==Enum.Material.Ice then
 c.Material=Enum.Material.Plastic
