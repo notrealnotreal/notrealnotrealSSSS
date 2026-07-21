@@ -144,7 +144,7 @@ local function sound()
 end
 
 local function KillEnemy(state)
-    local checker = Instance.new("Part")]
+    local checker = Instance.new("Part")
     local failsafe = Instance.new("Part")
     checker.Name = "ddkkkdkdkdkdkd"
     failsafe.Name = "hiimmenandimthecoolfailsasve"
