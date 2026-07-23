@@ -927,6 +927,77 @@ function t.UseAbility(p3, p4)
 	Events.RemoteFunctions.UseAbility:InvokeServer(p3.Name)
 end
 
+local CharacterModules = {
+	{
+		Abilities = {
+			Swing = { Name = "Swing", Cooldown = 1, InputShown = "M1", DisplayName = "Swing", Icon = "rbxassetid://95828395635772", Tip = "Swing forward to deal 20 damage." },
+			Implement = { Name = "Implement", Cooldown = 13, InputShown = "Q", DisplayName = "Implement", Icon = "rbxassetid://136267634030688", Tip = "Quickly create a wall that rises up from where you stand." },
+			Copywrite = { Name = "Copywrite", Cooldown = 3, InputShown = "E", DisplayName = "Copywrite", Icon = "rbxassetid://135215798929697", Tip = "Creates a MusicBox from where you stand, it will greatly slow and indicate any civilian that enters its radius." },
+			Repurpose = { Name = "Repurpose", Cooldown = 3, InputShown = "R", DisplayName = "Repurpose", Icon = "rbxassetid://109187183475737", Tip = "Reach in front of you and \"Pocket\" whatever you hit, this move changes functionality upon hitting a Wall, MusicBox, or a Civilian." },
+		}
+	},
+	{
+		Abilities = {
+			Swing = { Name = "Swing", Cooldown = 1, InputShown = "M1", DisplayName = "Swing", Icon = "rbxassetid://91900292604311", Tip = "Swing forward to deal 20 damage.", ColorScheme = Color3.fromRGB(54, 190, 39) },
+			FirewallBypass = { Name = "FirewallBypass", Cooldown = 10, InputShown = "Q", DisplayName = "Firewall Bypass", Icon = "rbxassetid://128815994656979", Tip = "Place down a PC that gives you multiple buffs when you are near it. Required in order to use Rift.", ColorScheme = Color3.fromRGB(54, 190, 39) },
+			Bolt = { Name = "Bolt", Cooldown = 20, InputShown = "E", DisplayName = "Bolt", Icon = "rbxassetid://72545932076875", Tip = "Stop in place and dash forward to deal 20 damage. This ability is significantly stronger if used in PC range.", CanRecast = 0.25, RecastDisplayName = "Cancel", ColorScheme = Color3.fromRGB(54, 190, 39) },
+			Rift = { Name = "Rift", Cooldown = 20, InputShown = "R", DisplayName = "Rift", Icon = "rbxassetid://127133544413220", Tip = "Stop in place and select a PC to teleport to it, alongside gaining a speed boost, but destroying the chosen PC.", CanRecast = 2, RecastDisplayName = "Cancel", ColorScheme = Color3.fromRGB(54, 190, 39) },
+		}
+	},
+	{
+		Abilities = {
+			Adrenaline = { Name = "Adrenaline", Cooldown = 30, DisplayName = "Adrenaline", Icon = "rbxassetid://116399911657417", Tip = "Scream and receive a massive speed boost which tones down overtime, leaving a trail of afterimages behind you that grant speed to teammates. After a while, you'll be heavily slowed down and given Exhaust for a bit.", Category = "Survivalist" },
+			Punch = { Name = "Punch", Cooldown = 40, DisplayName = "Punch", Icon = "rbxassetid://97428323453639", Tip = "Swing forward and stun the killer for 3 seconds if hit. Missing will result in heavy end-lag.", Category = "Sentinel" },
+			Caretaker = { Name = "Caretaker", Cooldown = 30, DisplayName = "Caretaker", Icon = "rbxassetid://90712805517714", OneBounceDisabled = true, Tip = "Splash a potion in front of you and heal anyone for 10 HP instantly, and another 10 overtime. This ability lowers Max HP by 20. Other Caretakers get slower heals by this ability.", HealthModifier = -20, Category = "Support" },
+			Cloak = { Name = "Cloak", Cooldown = 30, DisplayName = "Cloak", Icon = "rbxassetid://90476367580326", Tip = "Slow down & go invisible for 5 seconds. Sprinting and SP regeneration is paused while invisible, being hit will force you to be visible again.", Category = "Survivalist" },
+			Block = { Name = "Block", Cooldown = 35, DisplayName = "Block", Icon = "rbxassetid://120929805037270", Tip = "Raise your arm up in a blocking stance for 1 second, getting hit by (mostly) anything will grant a speed boost and regen 10 HP and lock the killer's abilities for a second.", Category = "Survivalist" },
+			Dash = { Name = "Dash", Cooldown = 35, DisplayName = "Dash", Icon = "rbxassetid://86732699606578", Tip = "Dash forward and drain 30 SP. Colliding with a Killer mid-dash will knock them back. Usage while under 25 SP with the dash will result in a ragdoll and pause SP regen. Killers receive knockback immunity for a bit after being dashed into.", Category = "Survivalist" },
+			BonusPad = { Name = "BonusPad", Cooldown = 45, DisplayName = "BonusPad", Icon = "rbxassetid://86775625332300", Tip = "Place down a pad that speeds up any Civilian that comes in contact with it. Has 18 HP, and can be destroyed by the killer.", HealthModifier = -10, Category = "Support", Synergies = { CarePad = { Tip = "Place down a pad that regenerates 1 HP every 1 second for any Civilian who comes into contact with it. Has 18 HP, and can be destroyed by the killer.", Color = Color3.fromRGB(84, 202, 48) } } },
+			Hotdog = { Name = "Hotdog", Cooldown = 35, DisplayName = "Hotdog", Icon = "rbxassetid://134322360499381", Tip = "Take out a yummy hotdog & eat it for 15 HP and 5 extra Max HP. Every hotdog consumed will make your collision and hurtbox slightly fatter.", Category = "Survivalist", Synergies = { SweetTooth = { Tip = "Take out a piece of cake & eat it for 30 total HP. Every consumption REMOVES 7 of your Max HP.", Color = Color3.fromRGB(255, 32, 91) } } },
+			Revolver = { Name = "Revolver", Cooldown = 15, DisplayName = "Revolver", Icon = "rbxassetid://118510743851456", ReloadIcon = "rbxassetid://112297950117649", Tip = "Stop in place and fire your revolver forwards, shooting out a projectile with an explosive AOE that stuns the Killer for 2 seconds. After firing you'll need to reload your revolver in order to use it again.", Category = "Sentinel", Synergies = { Loveshot = { Tip = "Stop in place and shoot out 3 bullets forward, with each one locking the killers abilities and slowing them down. Each successful shot regens 7 HP to yourself and to those around you.", Color = Color3.fromRGB(148, 64, 130) } } },
+			Taunt = { Name = "Taunt", Cooldown = 40, DisplayName = "Taunt", Icon = "rbxassetid://85436299122876", Tip = "Taunt the killer at close range with a spherical hitbox, hitting them will heavily knock them back & highlight you to the Killer. While highlighted, you receive 1.25x more damage. If they fail to hit you by the time the highlight ends, they'll be heavily slowed down temporarily.", Category = "Sentinel" },
+			Banana = { Name = "Banana", Cooldown = 20, DisplayName = "Banana Peel", Icon = "rbxassetid://96202444819611", Tip = "Shoot a banana peel onto the floor, if the Civilian who placed it or the Killer steps on it, they'll be ragdolled for 2 seconds. The banana will decay over the span of 25 seconds.", Category = "Sentinel" },
+			Bugle = { Name = "Bugle", Cooldown = 45, UnnafectedByHastened = true, DisplayName = "Bugle", Icon = "rbxassetid://115349910291644", Tip = "Receive heavy slowness & complete 4 minigames in a row, each one granting +x0.25 faster cooldowns to any nearby teammates. This ability lowers Max HP by 15.", HealthModifier = -15, Category = "Support", Synergies = { NoiseMaker = { Tip = "Receive heavy slowness & complete 8 minigames in a row, each one granting 6% resistance to any nearby teammates. Getting hit while playing results in x1.25 more incoming damage. This ability lowers Max HP by 15.", Color = Color3.fromRGB(37, 93, 245) } } },
+			Flashlight = { Name = "Flashlight", Cooldown = 35, DisplayName = "Flashlight", Icon = "rbxassetid://94917058377766", Tip = "Hold a flashlight's beam of light forward, slowing down the killer for every tick. Landing 15/20 ticks will heal you for 10 HP and disorientate the Killer for a while, making them more vulnerable to stuns.", Category = "Support" },
+			Reroll = { Name = "Reroll", Cooldown = 30, StartingCooldown = 8, DisplayName = "Reroll", Icon = "rbxassetid://92803449105080", Tip = "Stop in place and pick a card, giving you a random temporary ability that disappears on use.", Category = "Survivalist" },
+			Pie = { Name = "Pie", Cooldown = 20, DisplayName = "Pie", Icon = "rbxassetid://101081149194493", Tip = "Stop in place and charge up a projectile pie. Hitting the Killer with the pie will hide their ability cooldowns & slow them down temporarily.", Category = "Support" },
+			Golf_Push = { Name = "Golf_Push", Cooldown = 0.3, DisplayName = "Push", Icon = "rbxassetid://108193193341173", Tip = "Hit the Golf Ball to slightly push it forward.", Special = true, InPanel = true },
+			Golf_Hit = { Name = "Golf_Hit", Cooldown = 0.8, DisplayName = "Hit", Icon = "rbxassetid://105747948217841", Tip = "Hit the Golf Ball to send it forward!", Special = true, InPanel = true },
+			ShotgunKick = { Name = "ShotgunKick", Cooldown = 0.25, DisplayName = "Kick", Icon = "rbxassetid://31613709", Tip = "Kick forward and destroy the shins of whoever poor soul is infront of you.", Special = true, InPanel = true },
+			ShotgunShoot = { Name = "ShotgunShoot", Cooldown = 0.5, DisplayName = "Shoot", Icon = "rbxassetid://31613709", Tip = "What is DoD even about bruh", Special = true, InPanel = true },
+			FryBomber_Swing = { Name = "FryBomber_Swing", Cooldown = 0.6, DisplayName = "Swing", Icon = "rbxassetid://106009200830695", Tip = "HIT A CIVILIAN TO PASS THE FRYBOMB!!!", Special = true, InPanel = true },
+			FryBomber_Throw = { Name = "FryBomber_Throw", Cooldown = 5, DisplayName = "Throw", Icon = "rbxassetid://99666976281259", Tip = "THROW YOUR FRYBOMB FORWARD!!!", Special = true, InPanel = true },
+		}
+	},
+	{
+		Abilities = {}
+	},
+	{
+		Abilities = {
+			Swing = { Name = "Swing", Cooldown = 1, InputShown = "M1", DisplayName = "Stab", Icon = "rbxassetid://79789896606805", EnrageIcon = "rbxassetid://73119623699146", EnrageDisplayName = "Swing", EnrageCooldown = 1, Tip = "Swing forwards to deal 15 damage.", EnrageTip = "Swing forwards to deal 20 damage.", Noise = "Causes 2 noise if landed.", ColorScheme = Color3.fromRGB(230, 167, 19) },
+			Repress = { Name = "Repress", Cooldown = 30, InputShown = "Q", DisplayName = "Repress", Icon = "rbxassetid://119980024420991", EnrageIcon = "rbxassetid://89561999503016", EnrageDisplayName = "Pummel", EnrageCooldown = 20, Tip = "Manifest a zone around you that follows at a delay, any Civilian in this zone will have severely increased Noise gain.", EnrageTip = "Grab anyone in front of you and viciously beat them to a pulp. Does significantly more damage if landed on a red highlighted Civilian.", Noise = "Causes 5 noise upon use.", ColorScheme = Color3.fromRGB(230, 167, 19) },
+			Agitation = { Name = "Agitation", Cooldown = 17, StartingCooldown = 15, InputShown = "E", DisplayName = "Agitation", Icon = "rbxassetid://103298324762725", EnrageIcon = "rbxassetid://115592151481987", EnrageDisplayName = "Light Piercer", EnrageCooldown = 25, Tip = "Stop in place and shoot out 10 turnable shockwaves forward, which increase Noise and slow Civilians down.", EnrageTip = "Stop in place and pierce the ground, summoning a giant light pillar that deals 35 damage to any Civilian who collides with it.", Noise = "Causes 5 noise upon use.", ColorScheme = Color3.fromRGB(230, 167, 19) },
+			HarkenSwitch = { Name = "HarkenSwitch", Cooldown = 5, InputShown = "R", DisplayName = "ENRAGE", Icon = "rbxassetid://99441752406269", EnrageIcon = "rbxassetid://108194370208173", EnrageDisplayName = "Immolate", EnrageCooldown = 20, Tip = "Switch between Enrage mode and Calm mode, Enraged can only be activated if at 35 noise or more.", EnrageTip = "Stop in place and impale yourself with a javelin, gaining 60 Noise at the cost of 100 damage and 50 damage overtime.", Noise = "Causes no noise upon use.", ColorScheme = Color3.fromRGB(204, 21, 21) },
+		}
+	},
+	{
+		Abilities = {
+			Eject = { Name = "Eject", Cooldown = 1.5, InputShown = "M1", DisplayName = "Eject", Icon = "rbxassetid://104399918505448", Tip = "Heavily slow down before shooting a Missile forwards that deals 25 damage in a splash radius. The splash radius can go through walls.", ColorScheme = Color3.fromRGB(212, 27, 27) },
+			Flight = { Name = "Flight", Cooldown = 15, InputShown = "Q", DisplayName = "Flight", Icon = "rbxassetid://119091263099069", Tip = "Completely stop in place for 1 second before flying up into the air, Eject gains aimbot while you are not grounded.", CanRecast = 2, RecastDisplayName = "Cancel", RecastIcon = "rbxassetid://93106430986611", ColorScheme = Color3.fromRGB(212, 27, 27) },
+			Deploy = { Name = "Deploy", Cooldown = 8, InputShown = "E", DisplayName = "Deploy", Icon = "rbxassetid://96669704702337", Tip = "Call in a Killbot at your current location that shoots out rockets at civilians in range.", ColorScheme = Color3.fromRGB(212, 27, 27) },
+			Propel = { Name = "Propel", Cooldown = 17, InputShown = "R", DisplayName = "Propel", Icon = "rbxassetid://80421839679371", Tip = "Stop in place and leap upwards, dealing 25 damage to anyone around when you land.", ColorScheme = Color3.fromRGB(212, 27, 27) },
+		}
+	},
+	{
+		Abilities = {
+			Swing = { Name = "Swing", Cooldown = 1, InputShown = "M1", DisplayName = "Swing", Icon = "rbxassetid://86297288069487", Tip = "Swing forward to deal 20 damage.", ColorScheme = Color3.fromRGB(61, 169, 177) },
+			Cleave = { Name = "Cleave", Cooldown = 22, InputShown = "Q", DisplayName = "Cleave", Icon = "rbxassetid://92447235780730", Tip = "Lunge forward and deal 20 damage directly and 10 damage in bleed. Bleeding targets are highlighted to you.", StalkVariant = "rbxassetid://94144266032751", StalkVariantName = "Lunge", StalkVariantTip = "Unshroud and dash forward with your dagger, dealing 20 damage directly and 10 damage in bleed. ", ColorScheme = Color3.fromRGB(61, 169, 177) },
+			Howl = { Name = "Howl", Cooldown = 20, InputShown = "E", DisplayName = "Howl", Icon = "rbxassetid://121485044324107", Tip = "Scream out a shockwave projectile that follows cursor/camera. Slows down & highlights any targets hit.", StalkVariant = "rbxassetid://85865568320883", StalkVariantName = "Chomp", StalkVariantTip = "Unshroud and chomp forward, dealing 10 damage and 15+ bleed damage. The bleed increases with how many people were hit by the chomp.", ColorScheme = Color3.fromRGB(61, 169, 177) },
+			Stalk = { Name = "Stalk", Cooldown = 25, StartingCooldown = 10, UnnafectedByHastened = true, InputShown = "R", DisplayName = "Stalk", Icon = "rbxassetid://92577246919936", Tip = "Turn completely invisible receive and increased movement speed & altered abilities. Recast to cancel early.", CanRecast = 5, RecastDisplayName = "Unshroud", RecastIcon = "rbxassetid://93106430986611", ColorScheme = Color3.fromRGB(61, 169, 177) },
+		}
+	},
+}
+
 function t.CheckForKeybind(p3)
 	local v1 = nil
 	for _, v in pairs(RoundUI.PlayerUI.Abilities.Folder:GetChildren()) do
@@ -938,8 +1009,7 @@ function t.CheckForKeybind(p3)
 	if not v1 then return end
 
 	local v2 = nil
-	for _, v in pairs(ClientModules.Characters:GetChildren()) do
-		local v3 = require(v)
+	for _, v3 in pairs(CharacterModules) do
 		if v3.Abilities and v3.Abilities[v1.Name] then
 			v2 = v3
 			break
@@ -1069,12 +1139,8 @@ end)
 local function findAbility(name)
 	if not name or name == "" then return nil end
 
-	local charactersFolder = ClientModules:FindFirstChild("Characters")
-	if not charactersFolder then return nil end
-
-	for _, moduleScript in pairs(charactersFolder:GetChildren()) do
-		local ok, mod = pcall(require, moduleScript)
-		if ok and mod and mod.Abilities then
+	for _, mod in pairs(CharacterModules) do
+		if mod.Abilities then
 			for abilityName, abilityData in pairs(mod.Abilities) do
 				if abilityName == name then
 					return abilityData
