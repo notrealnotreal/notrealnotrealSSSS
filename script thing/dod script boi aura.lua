@@ -244,20 +244,9 @@ end
 coroutine.wrap(Variables.KeybindLoop)()
 
 -- ============================================================================
--- GUI COLLECT (inlined)
+-- GUI COLLECT (use existing)
 -- ============================================================================
-local MainGui
-do
-	local ok, result = pcall(function()
-		return ReplicatedStorage:WaitForChild("GuiLibrary"):WaitForChild("MainGui"):Clone()
-	end)
-	if ok and result then
-		MainGui = result
-		MainGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-	else
-		MainGui = LocalPlayer.PlayerGui:FindFirstChild("MainGui")
-	end
-end
+local MainGui = LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("MainGui", 15)
 
 local RoundUI = MainGui and MainGui:WaitForChild("RoundUI", 5)
 local PlayerUI = RoundUI and RoundUI:WaitForChild("PlayerUI", 5)
@@ -1101,22 +1090,16 @@ local function findAbility(name)
 end
 
 -- ============================================================================
--- UI CREATION
+-- UI CREATION (inside existing MainGui, draggable)
 -- ============================================================================
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "AbilityCreator"
-screenGui.ResetOnSpawn = false
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-
 local frame = Instance.new("Frame")
-frame.Name = "MainFrame"
+frame.Name = "AbilityCreator"
 frame.Size = UDim2.new(0, 260, 0, 120)
 frame.Position = UDim2.new(0, 10, 0.5, -60)
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BackgroundTransparency = 0.1
 frame.BorderSizePixel = 0
-frame.Parent = screenGui
+frame.Parent = MainGui
 
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 8)
@@ -1129,7 +1112,7 @@ frameStroke.Parent = frame
 
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "Title"
-titleLabel.Size = UDim2.new(1, -16, 0, 24)
+titleLabel.Size = UDim2.new(1, -40, 0, 24)
 titleLabel.Position = UDim2.new(0, 8, 0, 6)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Text = "Ability Creator"
@@ -1138,6 +1121,22 @@ titleLabel.TextSize = 14
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = frame
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Name = "CloseBtn"
+closeBtn.Size = UDim2.new(0, 20, 0, 20)
+closeBtn.Position = UDim2.new(1, -26, 0, 6)
+closeBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+closeBtn.BorderSizePixel = 0
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.TextSize = 12
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.Parent = frame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 4)
+closeCorner.Parent = closeBtn
 
 local inputBox = Instance.new("TextBox")
 inputBox.Name = "AbilityInput"
@@ -1185,6 +1184,48 @@ statusLabel.TextSize = 11
 statusLabel.Font = Enum.Font.Gotham
 statusLabel.TextXAlignment = Enum.TextXAlignment.Left
 statusLabel.Parent = frame
+
+-- ============================================================================
+-- DRAGGING (drag via title bar)
+-- ============================================================================
+do
+	local dragging = false
+	local dragStart = nil
+	local startPos = nil
+
+	titleLabel.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+		end
+	end)
+
+	titleLabel.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+	end)
+end
+
+-- ============================================================================
+-- CLOSE BUTTON
+-- ============================================================================
+closeBtn.MouseButton1Click:Connect(function()
+	frame.Visible = not frame.Visible
+end)
 
 -- ============================================================================
 -- BUTTON HANDLER
