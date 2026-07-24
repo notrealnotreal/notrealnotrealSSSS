@@ -171,7 +171,9 @@ function Variables.GetKeybindString(p1, p2)
 end
 
 function Variables.GetKeybindStringAbility(p1)
-	local v1 = p1.Name
+	local v1 = p1
+
+print(p1)
 
 	if p1.EnumType == Enum.KeyCode and game.UserInputService:GetStringForKeyCode(p1) ~= "" then
 		v1 = game.UserInputService:GetStringForKeyCode(p1)
@@ -602,6 +604,15 @@ function t.CreateAbility(p3, p4, customKeybind, useToggle)
 	v1:SetAttribute("Category", p3.Category)
 	if useToggle then
 		v1:SetAttribute("IsToggle", true)
+	end
+
+	if not p4 and LocalPlayer.Character then
+		local char = LocalPlayer.Character
+		local abilityNum = 1
+		while char:GetAttribute("Ability" .. abilityNum) do
+			abilityNum = abilityNum + 1
+		end
+		char:SetAttribute("Ability" .. abilityNum, p3.Name)
 	end
 
 	local Input = v1.Input
@@ -1171,6 +1182,15 @@ end
 -- ============================================================================
 -- UI CREATION (inside existing MainGui, draggable)
 -- ============================================================================
+
+if MainGui:FindFirstChild("AbilityCreator") then 
+	for i, v in pairs(MainGui:GetChildren()) do
+		if v.Name == "AbilityCreator" then 
+		   v:Destroy
+        end
+   end
+end
+
 local frame = Instance.new("Frame")
 frame.Name = "AbilityCreator"
 frame.Size = UDim2.new(0, 260, 0, 190)
@@ -1371,6 +1391,8 @@ end)
 -- ============================================================================
 -- BUTTON HANDLER
 -- ============================================================================
+
+
 createBtn.MouseButton1Click:Connect(function()
 	local abilityName = inputBox.Text
 	if not abilityName or abilityName == "" then
