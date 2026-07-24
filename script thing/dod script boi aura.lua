@@ -1186,7 +1186,7 @@ end
 if MainGui:FindFirstChild("AbilityCreator") then 
 	for i, v in pairs(MainGui:GetChildren()) do
 		if v.Name == "AbilityCreator" then 
-		   v:Destroy
+			pcall(function() v:Destroy() end)
         end
    end
 end
