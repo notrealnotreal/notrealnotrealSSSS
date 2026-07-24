@@ -523,7 +523,7 @@ function t.UpdateAbilityKeybind(p3, p4, p5, p6)
 	return v2
 end
 
-function t.CreateAbility(p3, p4)
+function t.CreateAbility(p3, p4, customKeybind, useToggle)
 	if RoundUI.PlayerUI.Abilities.Folder:FindFirstChild(p3.Name) then return end
 
 	if LocalPlayer.Character then
@@ -553,6 +553,9 @@ function t.CreateAbility(p3, p4)
 
 	if p4 then
 		v2 = t.UpdateAbilityKeybind(p3, v1, nil, count)
+	elseif customKeybind and customKeybind ~= "" and p3.Category then
+		v2 = customKeybind
+		v3 = count + 2
 	elseif p3.InputShown == "Q" then
 		v2 = Variables["AbilityInput" .. count + 2]
 		v3 = 2
@@ -578,18 +581,28 @@ function t.CreateAbility(p3, p4)
 	end
 
 	if not p4 then
-		t.DisplayKeybind(v2, v1)
+		if type(v2) == "string" then
+			v1.Input.Text = v2
+			v1:SetAttribute("Keybind", v2)
+		else
+			t.DisplayKeybind(v2, v1)
+		end
 		v1.LayoutOrder = v3
 	end
 
 	v1.Parent = PlayerUI.Abilities.Folder
 	v1.Name = p3.Name
-	v1.Input.Text = Variables.GetKeybindStringAbility(v2)
+	if type(v2) ~= "string" then
+		v1.Input.Text = Variables.GetKeybindStringAbility(v2)
+	end
 	v1.Title.Text = p3.DisplayName
 	v1.Cooldown.Visible = false
 	v1.CooldownLabel.Visible = false
 	v1.Gimmicks.Limit.Visible = false
 	v1:SetAttribute("Category", p3.Category)
+	if useToggle then
+		v1:SetAttribute("IsToggle", true)
+	end
 
 	local Input = v1.Input
 	Input.TextTransparency = Input.TextTransparency + 1
@@ -1160,8 +1173,8 @@ end
 -- ============================================================================
 local frame = Instance.new("Frame")
 frame.Name = "AbilityCreator"
-frame.Size = UDim2.new(0, 260, 0, 120)
-frame.Position = UDim2.new(0, 10, 0.5, -60)
+frame.Size = UDim2.new(0, 260, 0, 190)
+frame.Position = UDim2.new(0, 10, 0.5, -95)
 frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BackgroundTransparency = 0.1
 frame.BorderSizePixel = 0
@@ -1223,10 +1236,72 @@ local inputCorner = Instance.new("UICorner")
 inputCorner.CornerRadius = UDim.new(0, 6)
 inputCorner.Parent = inputBox
 
+local keybindBox = Instance.new("TextBox")
+keybindBox.Name = "CustomKeybind"
+keybindBox.Size = UDim2.new(0.65, -12, 0, 24)
+keybindBox.Position = UDim2.new(0, 8, 0, 70)
+keybindBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+keybindBox.BorderSizePixel = 0
+keybindBox.Text = ""
+keybindBox.PlaceholderText = "Custom keybind (civilian)"
+keybindBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+keybindBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+keybindBox.TextSize = 11
+keybindBox.Font = Enum.Font.Gotham
+keybindBox.ClearTextOnFocus = false
+keybindBox.Parent = frame
+
+local keybindCorner = Instance.new("UICorner")
+keybindCorner.CornerRadius = UDim.new(0, 4)
+keybindCorner.Parent = keybindBox
+
+local isToggle = false
+
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Name = "ToggleBtn"
+toggleBtn.Size = UDim2.new(0.35, -12, 0, 24)
+toggleBtn.Position = UDim2.new(0.65, 4, 0, 70)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 40, 40)
+toggleBtn.BorderSizePixel = 0
+toggleBtn.Text = "Toggle: OFF"
+toggleBtn.TextColor3 = Color3.fromRGB(180, 120, 120)
+toggleBtn.TextSize = 11
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.Parent = frame
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 4)
+toggleCorner.Parent = toggleBtn
+
+toggleBtn.MouseButton1Click:Connect(function()
+	isToggle = not isToggle
+	if isToggle then
+		toggleBtn.Text = "Toggle: ON"
+		toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 80, 40)
+		toggleBtn.TextColor3 = Color3.fromRGB(200, 255, 200)
+	else
+		toggleBtn.Text = "Toggle: OFF"
+		toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 40, 40)
+		toggleBtn.TextColor3 = Color3.fromRGB(180, 120, 120)
+	end
+end)
+
+local warnLabel = Instance.new("TextLabel")
+warnLabel.Name = "WarnLabel"
+warnLabel.Size = UDim2.new(1, -16, 0, 16)
+warnLabel.Position = UDim2.new(0, 8, 0, 98)
+warnLabel.BackgroundTransparency = 1
+warnLabel.Text = "Custom keybind & toggle only apply to civilian abilities"
+warnLabel.TextColor3 = Color3.fromRGB(180, 150, 60)
+warnLabel.TextSize = 9
+warnLabel.Font = Enum.Font.Gotham
+warnLabel.TextXAlignment = Enum.TextXAlignment.Left
+warnLabel.Parent = frame
+
 local createBtn = Instance.new("TextButton")
 createBtn.Name = "CreateBtn"
 createBtn.Size = UDim2.new(1, -16, 0, 30)
-createBtn.Position = UDim2.new(0, 8, 0, 70)
+createBtn.Position = UDim2.new(0, 8, 0, 118)
 createBtn.BackgroundColor3 = Color3.fromRGB(40, 80, 40)
 createBtn.BorderSizePixel = 0
 createBtn.Text = "Create Ability"
@@ -1242,7 +1317,7 @@ btnCorner.Parent = createBtn
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Name = "Status"
 statusLabel.Size = UDim2.new(1, -16, 0, 14)
-statusLabel.Position = UDim2.new(0, 8, 0, 104)
+statusLabel.Position = UDim2.new(0, 8, 0, 152)
 statusLabel.BackgroundTransparency = 1
 statusLabel.Text = ""
 statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -1312,8 +1387,11 @@ createBtn.MouseButton1Click:Connect(function()
 		return
 	end
 
+	local customKeybind = keybindBox.Text
+	local useToggle = isToggle
+
 	local ok, err = pcall(function()
-		t.CreateAbility(abilityData, false)
+		t.CreateAbility(abilityData, false, customKeybind, useToggle)
 	end)
 
 	if ok then
