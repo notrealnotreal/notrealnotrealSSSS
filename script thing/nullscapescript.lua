@@ -95,16 +95,14 @@ local Window = Rayfield:CreateWindow({
 local MainTab = Window:CreateTab("Main", 4483362458) 
 local GameTab = Window:CreateTab("Game", 4483362458)
 local EnemyTab = Window:CreateTab("Enemy Spawner", 4483362458)
-local FunTab = Window:CreateTab("Fun", 4483362458)
 local SlammyTab = Window:CreateTab("Slammy", 97956330326398)
 local whatever = Window:CreateTab("hi this was added cuz my friend requested it", 126824355195428)
 
 local sound = game:GetService("SoundService")
 local sfxfolder = sound.SFXFolder
-local deletefolder = Instance.new("Folder")
-local statusfolder = Instance.new("Folder")
-statusfolder.Name = "NULLHUBSTT"
-deletefolder.Name = "Deleted"
+
+-- status
+local WawawaCode = false
 
 local plr = game.Players.LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
@@ -119,8 +117,6 @@ if plr:FindFirstChild("NULLHUBSTT") then
     pcall(function() plr:FindFirstChild("NULLHUBSTT"):Destroy() end)
 end
 
-deletefolder.Parent = plr
-
 local ExecutingEnemy = false
 local ExecutingOthers = false
 local ExecutingHusk = false
@@ -133,10 +129,6 @@ local function message(text)
    message.Text = text
    wait(3)
    pcall(function() message:Destroy() end)
-end
-
-local function tempdelete(child)
-   child.Parent = deletefolder
 end
 
 local function sound()
@@ -217,7 +209,7 @@ GameTab:CreateButton({
     CurrentValue = false,
     Flag = "TRIPMINEESPHELLIMYOURNEGIBHORUGFGODODOODODODOS",
     Callback = function()
-        local tripminething = workspace.Item_Pools.Tripmine
+        local tripminething = workspace.Item_Pools.Tripmine_Model
         local highlight = Instance.new("Highlight")
         highlight.Parent = tripminething
         highlight.FillColor = Color3.new(0, 255, 0)
@@ -278,14 +270,11 @@ GameTab:CreateButton({
 })
 
 GameTab:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
-if workspace:FindFirstChild('WawawaCode') then
+if WawawaCode == true then
     pcall(function() workspace:FindFirstChild('WawawaCode'):Destroy() end)
     return
 end
-local newpart = Instance.new("Part")
-newpart.Name = "WawawaCode"
-newpart.Anchored = true
-newpart.Parent = statusfolder
+WawawaCode = true
 end; })
 
 -- // ENEMY TAB \\ --
@@ -325,14 +314,6 @@ EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersO
 Enemy = Value
 end;})
 
--- // FUN TAB \\ --
-
-FunTab:CreateButton({Name = "Unlock Reset Button (Resets)"; Callback = function()
-game.StarterGui:SetCore("ResetButtonCallback", true)
-plr.PlayerGui.DISABLERESET.Enabled = false
-end; })
-
-
 -- on hold for rework
 task.spawn(function()
     sfxfolder.NewLevel:Play()
@@ -353,7 +334,7 @@ end
 if ExecutingEnemy == false and ExecutingHusk == true then
    pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
 end
-if statusfolder:FindFirstChild("WawawaCode") then
+if WawawaCode == true then
 for _,c in next, workspace.CurrentRooms:GetDescendants() do
 if c:IsA("BasePart") and c.Material==Enum.Material.Ice then
 c.Material=Enum.Material.Plastic
