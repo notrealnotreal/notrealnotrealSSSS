@@ -111,11 +111,7 @@ local ExecutingHusk = false
 local Enemy = "Bell"
 
 local function message(text)
-	Notificationwhereishovedicksupmyass = Rayfield:Notify(
-        Title = "nullbubnotif",
-        Content = text,
-        Image = "90885391599973"
-    )
+	Rayfield:Notify("nullbubnotif", text, 3, true)
 end
 
 local dist = 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 -- this holds up the entire enemy deleter script LOOL
