@@ -111,7 +111,8 @@ local ExecutingHusk = false
 local Enemy = "Bell"
 
 local function message(text)
-	Rayfield:Notify("nullbubnotif", text, 3, true)
+	Rayfield:Notify(tostring(text))
+    print(text)
 end
 
 local dist = 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 -- this holds up the entire enemy deleter script LOOL
@@ -152,7 +153,7 @@ whatever:CreateButton({
 
 MainTab:CreateParagraph({Title = "WIP", Content = "Missing more features i'd like to add, more things along the way, keybind is P! huge thanks to Nexer with their old hub scripts and me sharing just a bit of them!"})
 MainTab:CreateParagraph({Title = "Server", Content = "https://discord.gg/dKrbYz3g4h"})
-
+MainTab:CreateLabel("if the notification doesnt say anything check F9 mb im too tired to fix ill fix it later")
 
 local Button = MainTab:CreateButton({
     Name = "Infinite Yield",
@@ -170,11 +171,11 @@ SlammyTab:CreateParagraph({Title = "random dude", Content = "reached level 40+ w
 
 -- // TIPS TAB \\ -- 
 NullbubtipsTab:CreateParagraph({Title = "General Help", Content = ""})
-NullbubtipsTab:CreateLabel({LabelText = "Please use this script on a solo run or a duo run with friends you trust"})
-NullbubtipsTab:CreateLabel({LabelText = "It's recommended to use yields loopws and loopjp if you wanna go fast! i'm too lazy to make it myself"})
-NullbubtipsTab:CreateLabel({LabelText = "If you wanna infinite jump, set keybind on yield space bar and set the keybind on jump command"})
+NullbubtipsTab:CreateLabel("Please use this script on a solo run or a duo run with friends you trust")
+NullbubtipsTab:CreateLabel("It's recommended to use yields loopws and loopjp if you wanna go fast! i'm too lazy to make it myself")
+NullbubtipsTab:CreateLabel("If you wanna infinite jump, set keybind on yield space bar and set the keybind on jump command")
 NullbubtipsTab:CreateParagraph({Title = "Celestial Help", Content = ""})
-NullbubtipsTab:CreateLabel({LabelText = "The only attack (i assume) is hitable is futile, so watch out for that when fighting celestial"})
+NullbubtipsTab:CreateLabel("The only attack that i assume is hitable is futile, so watch out for that when fighting celestial")
 
 -- // GAME TAB \\ --
 
@@ -318,7 +319,6 @@ task.spawn(function()
     message("PLEASE DO NOT RUN THIS SCRIPT MORE THAN TWICE, THINGS MAY BREAK!")
 end)
 
-hint:Destroy()
 while true do
 if ExecutingEnemy == true and dist == 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 then -- i wasnt joking btw
     for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetChildren()) do
