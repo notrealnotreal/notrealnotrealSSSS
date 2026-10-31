@@ -88,8 +88,8 @@ local Window = Rayfield:CreateWindow({
 local MainTab = Window:CreateTab("Main", 4483362458) 
 local GameTab = Window:CreateTab("Game", 4483362458)
 local EnemyTab = Window:CreateTab("Enemy Spawner", 4483362458)
---local FunTab = Window:CreateTab("Fun", 4483362458)
 local SlammyTab = Window:CreateTab("Slammy", 97956330326398)
+local TipsTab = Window:CreateTab("Tips", 97956330326398)
 local whatever = Window:CreateTab("hi this was added cuz my friend requested it", 126824355195428)
 
 local sound = game:GetService("SoundService")
@@ -165,13 +165,19 @@ local Button = MainTab:CreateButton({
     end,
 })
 
-MainTab:CreateParagraph({Title = "Help", Content = "It's recommended to use yields loopws and loopjp if you wanna go fast! i'm too lazy to make it myself"})
-MainTab:CreateLabel({LabelText = "If you wanna infinite jump, set keybind on yield space bar and set the keybind on jump command"})
 -- // SlAMMY TAB \\ --
 
 SlammyTab:CreateParagraph({Title = "slammy", Content = "the goat"})
 SlammyTab:CreateParagraph({Title = "nottreal", Content = "Main Dev"})
 SlammyTab:CreateParagraph({Title = "random dude", Content = "reached level 40+ with my script and did voidbound scarf solo WITH beating celestial, longest run ive seen with it so far, im really proud of them!"})
+
+-- // TIPS TAB \\ -- 
+SlammyTab:CreateParagraph({Title = "General Help", Content = ""})
+TipsTab:CreateLabel({LabelText = "Please use this script on a solo run or a duo run with friends you trust"})
+TipsTab:CreateLabel({LabelText = "It's recommended to use yields loopws and loopjp if you wanna go fast! i'm too lazy to make it myself"})
+TipsTab:CreateLabel({LabelText = "If you wanna infinite jump, set keybind on yield space bar and set the keybind on jump command"})
+SlammyTab:CreateParagraph({Title = "Celestial Help", Content = ""})
+TipsTab:CreateLabel({LabelText = "The only attack (i assume) is hitable is futile, so watch out for that when fighting celestial"})
 
 -- // GAME TAB \\ --
 
@@ -306,8 +312,6 @@ EnemyTab:CreateButton({
 EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersOnly = false; OnEnter = true; RemoveTextAfterFocusLost = false; Callback = function(Value)
 Enemy = Value
 end;})
-
--- // FUN TAB \\ --
 
 -- on hold for rework
 task.spawn(function()
