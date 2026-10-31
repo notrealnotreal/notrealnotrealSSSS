@@ -88,6 +88,7 @@ local Window = Rayfield:CreateWindow({
 local MainTab = Window:CreateTab("Main", 4483362458) 
 local GameTab = Window:CreateTab("Game", 4483362458)
 local EnemyTab = Window:CreateTab("Enemy Spawner", 4483362458)
+--local FunTab = Window:CreateTab("Fun", 4483362458)
 local SlammyTab = Window:CreateTab("Slammy", 97956330326398)
 local TipsTab = Window:CreateTab("Tips", 97956330326398)
 local whatever = Window:CreateTab("hi this was added cuz my friend requested it", 126824355195428)
@@ -313,6 +314,8 @@ EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersO
 Enemy = Value
 end;})
 
+-- // FUN TAB \\ --
+
 -- on hold for rework
 task.spawn(function()
     sfxfolder.NewLevel:Play()
@@ -321,7 +324,7 @@ end)
 
 hint:Destroy()
 while true do
-if ExecutingEnemy == true and dist = 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 then -- i wasnt joking btw
+if ExecutingEnemy == true and dist == 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 then -- i wasnt joking btw
     for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetChildren()) do
         if v.Name == "Guardian" or v.Name == "Voidbound Guardian" or v.Name == "Cadence" or v.Name == "StarMart" then
             -- hi
