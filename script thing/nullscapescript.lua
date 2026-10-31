@@ -1,15 +1,8 @@
-local hint = Instance.new("Hint")
-local message = Instance.new("Message")
 local placeId = game.PlaceId
 
 if placeId == 100588763114828 then
-    hint.Parent = workspace
-    hint.Text = "Loading script."
+
 else
-   message.Parent = workspace
-   message.Text = "You are not currently in the game place of nullscape, please enter a game inside of nullscape to be able to use this script."
-   wait(10)
-   pcall(function() message:Destroy() end)
    return 
 end
 
@@ -95,6 +88,7 @@ local Window = Rayfield:CreateWindow({
 local MainTab = Window:CreateTab("Main", 4483362458) 
 local GameTab = Window:CreateTab("Game", 4483362458)
 local EnemyTab = Window:CreateTab("Enemy Spawner", 4483362458)
+--local FunTab = Window:CreateTab("Fun", 4483362458)
 local SlammyTab = Window:CreateTab("Slammy", 97956330326398)
 local whatever = Window:CreateTab("hi this was added cuz my friend requested it", 126824355195428)
 
@@ -109,14 +103,6 @@ local char = plr.Character or plr.CharacterAdded:Wait()
 local hrp = char.HumanoidRootPart
 local humanoid = char:WaitForChild("Humanoid")
 
-if plr:FindFirstChild("Deleted") then
-    pcall(function() plr:FindFirstChild("Deleted"):Destroy() end)
-end
-
-if plr:FindFirstChild("NULLHUBSTT") then
-    pcall(function() plr:FindFirstChild("NULLHUBSTT"):Destroy() end)
-end
-
 local ExecutingEnemy = false
 local ExecutingOthers = false
 local ExecutingHusk = false
@@ -124,12 +110,14 @@ local ExecutingHusk = false
 local Enemy = "Bell"
 
 local function message(text)
-   local message = Instance.new("Hint")
-   message.Parent = workspace
-   message.Text = text
-   wait(3)
-   pcall(function() message:Destroy() end)
+	Notificationwhereishovedicksupmyass = Rayfield:Notify({
+        Title = "nullbubnotif",
+        Content = text,
+        Image = "90885391599973"
+    })
 end
+
+local dist = 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 -- this holds up the entire enemy deleter script LOOL
 
 local function sound()
     sfxfolder.PlayerDeath:Play()
@@ -165,7 +153,7 @@ whatever:CreateButton({
 
 -- // MAIN TAB \\ --
 
-MainTab:CreateParagraph({Title = "WIP", Content = "Missing more features i'd wish to add, more things along the way, keybind is P! huge thanks to Nexer with their old hub scripts and me sharing just a bit of them!"})
+MainTab:CreateParagraph({Title = "WIP", Content = "Missing more features i'd like to add, more things along the way, keybind is P! huge thanks to Nexer with their old hub scripts and me sharing just a bit of them!"})
 MainTab:CreateParagraph({Title = "Server", Content = "https://discord.gg/dKrbYz3g4h"})
 
 
@@ -177,7 +165,13 @@ local Button = MainTab:CreateButton({
     end,
 })
 
-MainTab:CreateParagraph({Title = "", Content = "It's recommended to use yields loopws and loopjp if you wanna go fast! i'm too lazy to make it myself"})
+MainTab:CreateParagraph({Title = "Help", Content = "It's recommended to use yields loopws and loopjp if you wanna go fast! i'm too lazy to make it myself"})
+MainTab:CreateLabel({LabelText = "If you wanna infinite jump, set keybind on yield space bar and set the keybind on jump command"})
+-- // SlAMMY TAB \\ --
+
+SlammyTab:CreateParagraph({Title = "slammy", Content = "the goat"})
+SlammyTab:CreateParagraph({Title = "nottreal", Content = "Main Dev"})
+SlammyTab:CreateParagraph({Title = "random dude", Content = "reached level 40+ with my script and did voidbound scarf solo WITH beating celestial, longest run ive seen with it so far, im really proud of them!"})
 
 -- // GAME TAB \\ --
 
@@ -282,7 +276,6 @@ end; })
 local function spawnEnemy(Enemy)
    local enemylist = game.ReplicatedStorage.EnemyFolder.Enemies
    local selectedEnemy = enemylist:FindFirstChild(Enemy)
-   print("this and that")
    if selectedEnemy then
        local cloneselected = selectedEnemy:Clone()
         for _, obj in ipairs(cloneselected:GetDescendants()) do
@@ -314,6 +307,8 @@ EnemyTab:CreateInput({Name = "Selected Enemy"; PlaceholderText = Enemy; NumbersO
 Enemy = Value
 end;})
 
+-- // FUN TAB \\ --
+
 -- on hold for rework
 task.spawn(function()
     sfxfolder.NewLevel:Play()
@@ -322,9 +317,9 @@ end)
 
 hint:Destroy()
 while true do
-if ExecutingEnemy == true then
+if ExecutingEnemy == true and dist = 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 then -- i wasnt joking btw
     for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetChildren()) do
-        if v.Name == "Guardian" or v.Name == "Voidbound Guardian" then
+        if v.Name == "Guardian" or v.Name == "Voidbound Guardian" or v.Name == "Cadence" or v.Name == "StarMart" then
             -- hi
         else
             pcall(function() v:Destroy() end)
