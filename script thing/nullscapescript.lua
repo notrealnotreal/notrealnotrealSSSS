@@ -90,7 +90,7 @@ local GameTab = Window:CreateTab("Game", 4483362458)
 local EnemyTab = Window:CreateTab("Enemy Spawner", 4483362458)
 --local FunTab = Window:CreateTab("Fun", 4483362458)
 local SlammyTab = Window:CreateTab("Slammy", 97956330326398)
-local TipsTab = Window:CreateTab("Tips", 97956330326398)
+local NullbubtipsTab = Window:CreateTab("NullbubTips", 4483362458)
 local whatever = Window:CreateTab("hi this was added cuz my friend requested it", 126824355195428)
 
 local sound = game:GetService("SoundService")
@@ -111,11 +111,11 @@ local ExecutingHusk = false
 local Enemy = "Bell"
 
 local function message(text)
-	Notificationwhereishovedicksupmyass = Rayfield:Notify({
+	Notificationwhereishovedicksupmyass = Rayfield:Notify(
         Title = "nullbubnotif",
         Content = text,
         Image = "90885391599973"
-    })
+    )
 end
 
 local dist = 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 -- this holds up the entire enemy deleter script LOOL
@@ -173,12 +173,12 @@ SlammyTab:CreateParagraph({Title = "nottreal", Content = "Main Dev"})
 SlammyTab:CreateParagraph({Title = "random dude", Content = "reached level 40+ with my script and did voidbound scarf solo WITH beating celestial, longest run ive seen with it so far, im really proud of them!"})
 
 -- // TIPS TAB \\ -- 
-SlammyTab:CreateParagraph({Title = "General Help", Content = ""})
-TipsTab:CreateLabel({LabelText = "Please use this script on a solo run or a duo run with friends you trust"})
-TipsTab:CreateLabel({LabelText = "It's recommended to use yields loopws and loopjp if you wanna go fast! i'm too lazy to make it myself"})
-TipsTab:CreateLabel({LabelText = "If you wanna infinite jump, set keybind on yield space bar and set the keybind on jump command"})
-SlammyTab:CreateParagraph({Title = "Celestial Help", Content = ""})
-TipsTab:CreateLabel({LabelText = "The only attack (i assume) is hitable is futile, so watch out for that when fighting celestial"})
+NullbubtipsTab:CreateParagraph({Title = "General Help", Content = ""})
+NullbubtipsTab:CreateLabel({LabelText = "Please use this script on a solo run or a duo run with friends you trust"})
+NullbubtipsTab:CreateLabel({LabelText = "It's recommended to use yields loopws and loopjp if you wanna go fast! i'm too lazy to make it myself"})
+NullbubtipsTab:CreateLabel({LabelText = "If you wanna infinite jump, set keybind on yield space bar and set the keybind on jump command"})
+NullbubtipsTab:CreateParagraph({Title = "Celestial Help", Content = ""})
+NullbubtipsTab:CreateLabel({LabelText = "The only attack (i assume) is hitable is futile, so watch out for that when fighting celestial"})
 
 -- // GAME TAB \\ --
 
