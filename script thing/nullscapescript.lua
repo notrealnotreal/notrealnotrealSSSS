@@ -322,7 +322,7 @@ end)
 while true do
 if ExecutingEnemy == true and dist == 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 then -- i wasnt joking btw
     for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetChildren()) do
-        if v.Name == "Guardian" or v.Name == "Voidbound Guardian" or v.Name == "Cadence" or v.Name == "StarMart" then
+        if v.Name == "Guardian" or v.Name == "ShadowGuardian" or v.Name == "Cadence" or v.Name == "StarMart" then
             -- hi
         else
             pcall(function() v:Destroy() end)
