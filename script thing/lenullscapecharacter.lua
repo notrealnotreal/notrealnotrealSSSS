@@ -171,41 +171,14 @@ local function NewGraph()
 	}
 end
 
-local function DirectionVector(Direction, Root)
-	local Forward = Root.CFrame.LookVector
-	local Right = Root.CFrame.RightVector
-
-	if Direction == "Forward" then
-		return Forward
-	elseif Direction == "Backward" then
-		return -Forward
-	elseif Direction == "Left" then
-		return -Right
-	elseif Direction == "Right" then
-		return Right
-	elseif Direction == "Up" then
-		return Vector3.new(0, 1, 0)
-	elseif Direction == "Down" then
-		return Vector3.new(0, -1, 0)
-	elseif Direction == "ForwardLeft" then
-		return (Forward - Right).Unit
-	elseif Direction == "ForwardRight" then
-		return (Forward + Right).Unit
-	elseif Direction == "BackwardLeft" then
-		return (-Forward - Right).Unit
-	elseif Direction == "BackwardRight" then
-		return (-Forward + Right).Unit
-	elseif Direction == "ThroughCamera" then
-		local Camera = workspace.CurrentCamera
-
-		if Camera then
-			return Camera.CFrame.LookVector
+local function GraphHasType(Graph, Type)
+	for _, Node in ipairs(Graph.Nodes or {}) do
+		if Node.Type == Type then
+			return true
 		end
-
-		return Forward
 	end
 
-	return Forward
+	return false
 end
 
 local function NormalizeGraph(Graph)
@@ -233,7 +206,7 @@ local function NormalizeGraph(Graph)
 
 	for Name, Branch in pairs(Graph.Branches) do
 		if type(Branch) == "table" then
-			NormalizeGraph(Branch)
+			Graph.Branches[Name] = NormalizeGraph(Branch)
 		else
 			Graph.Branches[Name] = nil
 		end
@@ -247,7 +220,7 @@ local function NormalizeData(Data)
 		return false
 	end
 
-	Data.Version = Data.Version or 3
+	Data.Version = Data.Version or 4
 	Data.Name = Data.Name or "Custom Class"
 	Data.Description = Data.Description or ""
 	Data.CurrencyName = Data.CurrencyName or "Coins"
@@ -310,14 +283,220 @@ local function NormalizeData(Data)
 	return true
 end
 
+local function DirectionVector(Direction, Root)
+	local Forward = Root.CFrame.LookVector
+	local Right = Root.CFrame.RightVector
+
+	if Direction == "Forward" then
+		return Forward
+	elseif Direction == "Backward" then
+		return -Forward
+	elseif Direction == "Left" then
+		return -Right
+	elseif Direction == "Right" then
+		return Right
+	elseif Direction == "Up" then
+		return Vector3.new(0, 1, 0)
+	elseif Direction == "Down" then
+		return Vector3.new(0, -1, 0)
+	elseif Direction == "ForwardLeft" then
+		return (Forward - Right).Unit
+	elseif Direction == "ForwardRight" then
+		return (Forward + Right).Unit
+	elseif Direction == "BackwardLeft" then
+		return (-Forward - Right).Unit
+	elseif Direction == "BackwardRight" then
+		return (-Forward + Right).Unit
+	elseif Direction == "ThroughCamera" then
+		local Camera = workspace.CurrentCamera
+
+		if Camera then
+			return Camera.CFrame.LookVector
+		end
+
+		return Forward
+	end
+
+	return Forward
+end
+
 local loadedData = nil
 local activeValues = {}
 local loadedCharacter = false
 
-local Upgrades
-local EnableRSpecial
-
 local AbilityBusy = false
+
+local CooldownEndTimes = {
+	E = 0,
+	R = 0
+}
+
+local CooldownTokens = {
+	E = 0,
+	R = 0
+}
+
+local function CreateProgressBar(Name, Title)
+	local PlayerGui = Player:WaitForChild("PlayerGui")
+
+	local Gui = Create("ScreenGui", PlayerGui, {
+		Name = Name,
+		ResetOnSpawn = false,
+		IgnoreGuiInset = true,
+		DisplayOrder = 100
+	})
+
+	local Frame = Create("Frame", Gui, {
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.new(0.5, 0, 0.88, 0),
+		Size = UDim2.fromOffset(320, 52),
+		BackgroundColor3 = Colors.Background
+	})
+
+	Round(Frame, 9)
+	Stroke(Frame, Colors.Button)
+
+	local Text = Label(
+		Frame,
+		Title,
+		UDim2.new(1, -20, 0, 22),
+		UDim2.fromOffset(10, 4)
+	)
+
+	Text.TextXAlignment = Enum.TextXAlignment.Center
+	Text.Font = Enum.Font.GothamBold
+
+	local Background = Create("Frame", Frame, {
+		Position = UDim2.fromOffset(10, 31),
+		Size = UDim2.new(1, -20, 0, 10),
+		BackgroundColor3 = Colors.Secondary
+	})
+
+	Round(Background, 5)
+
+	local Fill = Create("Frame", Background, {
+		Size = UDim2.new(0, 0, 1, 0),
+		BackgroundColor3 = Colors.Selected
+	})
+
+	Round(Fill, 5)
+
+	return Gui, Fill, Text
+end
+
+local function StartCooldown(AbilityName, Duration)
+	AbilityName = AbilityName or "E"
+
+	Duration = math.clamp(
+		tonumber(Duration) or 10,
+		0.1,
+		600
+	)
+
+	CooldownTokens[AbilityName] = (CooldownTokens[AbilityName] or 0) + 1
+
+	local Token = CooldownTokens[AbilityName]
+	local EndsAt = os.clock() + Duration
+
+	CooldownEndTimes[AbilityName] = EndsAt
+
+	local GuiName = "CustomCooldown_" .. AbilityName
+
+	local Existing = Player:WaitForChild("PlayerGui"):FindFirstChild(GuiName)
+
+	if Existing then
+		Existing:Destroy()
+	end
+
+	local Gui, Fill, Text = CreateProgressBar(
+		GuiName,
+		AbilityName .. " COOLDOWN"
+	)
+
+	task.spawn(function()
+		while Token == CooldownTokens[AbilityName]
+			and os.clock() < EndsAt
+			and Gui.Parent do
+
+			local Remaining = math.max(0, EndsAt - os.clock())
+			local Progress = 1 - Remaining / Duration
+
+			Fill.Size = UDim2.new(
+				math.clamp(Progress, 0, 1),
+				0,
+				1,
+				0
+			)
+
+			Text.Text = AbilityName .. " READY IN " .. string.format("%.1f", Remaining)
+
+			task.wait(0.03)
+		end
+
+		if Token == CooldownTokens[AbilityName] and Gui.Parent then
+			Fill.Size = UDim2.new(1, 0, 1, 0)
+			Text.Text = AbilityName .. " READY"
+
+			task.wait(1)
+
+			if Gui.Parent then
+				Gui:Destroy()
+			end
+		end
+	end)
+end
+
+local function ShowText(TextValue, Duration, TextSize, ColorValue)
+	local PlayerGui = Player:WaitForChild("PlayerGui")
+
+	local Gui = Create("ScreenGui", PlayerGui, {
+		Name = "CustomText_" .. HttpService:GenerateGUID(false),
+		ResetOnSpawn = false,
+		IgnoreGuiInset = true,
+		DisplayOrder = 110
+	})
+
+	local Frame = Create("Frame", Gui, {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromScale(0.5, 0.42),
+		Size = UDim2.new(0.8, 0, 0, 75),
+		BackgroundTransparency = 1
+	})
+
+	local RGB = ParseVector(ColorValue or "255,255,255")
+
+	local Text = Create("TextLabel", Frame, {
+		Size = UDim2.new(1, 0, 1, 0),
+		BackgroundTransparency = 1,
+		Text = tostring(TextValue or ""),
+		TextColor3 = Color3.fromRGB(
+			math.clamp(RGB.X, 0, 255),
+			math.clamp(RGB.Y, 0, 255),
+			math.clamp(RGB.Z, 0, 255)
+		),
+		TextSize = math.clamp(tonumber(TextSize) or 30, 8, 100),
+		Font = Enum.Font.GothamBold,
+		TextWrapped = true,
+		TextStrokeTransparency = 0.3
+	})
+
+	Duration = math.clamp(tonumber(Duration) or 2, 0.1, 60)
+
+	task.delay(math.max(0, Duration - 0.35), function()
+		if Text.Parent then
+			TweenService:Create(
+				Text,
+				TweenInfo.new(0.35),
+				{
+					TextTransparency = 1,
+					TextStrokeTransparency = 1
+				}
+			):Play()
+		end
+	end)
+
+	Debris:AddItem(Gui, Duration)
+end
 
 local function ExecuteNode(Node, Context)
 	local Character = Player.Character
@@ -336,9 +515,22 @@ local function ExecuteNode(Node, Context)
 	local Type = Node.Type
 
 	if Type == "Move" then
-		local Direction = DirectionVector(Node.Direction or "Forward", Root)
-		local Distance = math.clamp(tonumber(Node.Distance) or 20, -300, 300)
-		local Duration = math.clamp(tonumber(Node.Duration) or 0.25, 0.05, 15)
+		local Direction = DirectionVector(
+			Node.Direction or "Forward",
+			Root
+		)
+
+		local Distance = math.clamp(
+			tonumber(Node.Distance) or 20,
+			-300,
+			300
+		)
+
+		local Duration = math.clamp(
+			tonumber(Node.Duration) or 0.25,
+			0.05,
+			15
+		)
 
 		local Tween = TweenService:Create(
 			Root,
@@ -356,7 +548,9 @@ local function ExecuteNode(Node, Context)
 		Tween.Completed:Wait()
 
 	elseif Type == "Wait" then
-		task.wait(math.clamp(tonumber(Node.Duration) or 1, 0, 60))
+		task.wait(
+			math.clamp(tonumber(Node.Duration) or 1, 0, 60)
+		)
 
 	elseif Type == "SetValue" then
 		if Node.Editable == false then
@@ -526,11 +720,13 @@ local function ExecuteNode(Node, Context)
 
 		local NewPart = Instance.new("Part")
 		NewPart.Name = Preset.Name
-		NewPart.Size = ParseVector(Preset.Size)
+
+		local PartSize = ParseVector(Preset.Size)
+
 		NewPart.Size = Vector3.new(
-			math.max(0.1, NewPart.Size.X),
-			math.max(0.1, NewPart.Size.Y),
-			math.max(0.1, NewPart.Size.Z)
+			math.max(0.1, PartSize.X),
+			math.max(0.1, PartSize.Y),
+			math.max(0.1, PartSize.Z)
 		)
 
 		local RGB = ParseVector(Preset.Color)
@@ -655,21 +851,87 @@ local function ExecuteNode(Node, Context)
 		Debris:AddItem(Rope, Duration)
 		Debris:AddItem(Attachment0, Duration)
 		Debris:AddItem(Attachment1, Duration)
+
+	elseif Type == "Text" then
+		ShowText(
+			Node.Text or "Text",
+			Node.Duration or 2,
+			Node.TextSize or 30,
+			Node.Color or "255,255,255"
+		)
 	end
 end
 
-local function ExecuteGraph(Graph, Context, InputKey, BranchRoot)
+local function ExecuteTag(Node)
+	local TagName = tostring(Node.TagName or "Tagged")
+	local AttributeName = "CustomTag_" .. TagName
+	local Mode = Node.Mode or "Set"
+
+	local Current = Player:GetAttribute(AttributeName)
+
+	if Mode == "Set" then
+		Player:SetAttribute(
+			AttributeName,
+			tonumber(Node.TagValue) or 1
+		)
+
+	elseif Mode == "Reduce" then
+		if Current ~= nil then
+			local Amount = tonumber(Node.Amount) or 1
+			local NewValue = (tonumber(Current) or 1) - Amount
+
+			if NewValue <= 0 then
+				Player:SetAttribute(AttributeName, nil)
+			else
+				Player:SetAttribute(AttributeName, NewValue)
+			end
+		end
+
+	elseif Mode == "Divide" then
+		if Current ~= nil then
+			local Amount = tonumber(Node.Amount) or 1
+
+			if Amount ~= 0 then
+				Player:SetAttribute(
+					AttributeName,
+					(tonumber(Current) or 1) / Amount
+				)
+			end
+		end
+	end
+
+	return Current ~= nil
+end
+
+local function ExecuteSimpleNode(Node, Context)
+	if Node.Type == "Tag" then
+		ExecuteTag(Node)
+	else
+		ExecuteNode(Node, Context)
+	end
+end
+
+local function ExecuteGraph(Graph, Context, InputKey, RootGraph)
 	if type(Graph) ~= "table" or type(Graph.Nodes) ~= "table" then
 		return
 	end
 
-	BranchRoot = BranchRoot or Graph
+	RootGraph = RootGraph or Graph
 
 	Context = Context or {
-		Parts = {}
+		Parts = {},
+		AbilityName = "E"
 	}
 
 	Context.Parts = Context.Parts or {}
+
+	local HasHold = GraphHasType(Graph, "Hold")
+	local HasBar = GraphHasType(Graph, "Bar")
+
+	if HasHold and HasBar then
+		warn("This branch cannot contain both Hold and Bar nodes.")
+		return
+	end
 
 	local NodeMap = {}
 
@@ -693,17 +955,58 @@ local function ExecuteGraph(Graph, Context, InputKey, BranchRoot)
 			return false
 		end
 
-		local TargetGraph = BranchRoot.Branches
-			and BranchRoot.Branches[BranchName]
+		local TargetGraph = RootGraph.Branches
+			and RootGraph.Branches[BranchName]
 
 		if not TargetGraph then
 			warn("Branch not found:", BranchName)
 			return false
 		end
 
-		ExecuteGraph(TargetGraph, Context, InputKey, BranchRoot)
+		ExecuteGraph(
+			TargetGraph,
+			Context,
+			InputKey,
+			RootGraph
+		)
 
 		return true
+	end
+
+	local function RepeatPreviousNodes(NodeCount, Repeats)
+		local StartIndex = math.max(
+			1,
+			#History - NodeCount + 1
+		)
+
+		local PreviousNodes = {}
+
+		for Index = StartIndex, #History do
+			table.insert(PreviousNodes, History[Index])
+		end
+
+		for RepeatIndex = 1, Repeats do
+			for _, PreviousNode in ipairs(PreviousNodes) do
+				if Steps >= 500 then
+					return
+				end
+
+				Steps += 1
+
+				if PreviousNode.Type ~= "Loop"
+					and PreviousNode.Type ~= "Bar"
+					and PreviousNode.Type ~= "Cooldown"
+					and PreviousNode.Type ~= "Brancher"
+					and PreviousNode.Type ~= "Hold"
+					and not (
+						PreviousNode.Type == "Tag"
+						and PreviousNode.Mode == "Get"
+					) then
+
+					ExecuteSimpleNode(PreviousNode, Context)
+				end
+			end
+		end
 	end
 
 	while CurrentId and CurrentId ~= "" and Steps < 500 do
@@ -714,6 +1017,8 @@ local function ExecuteGraph(Graph, Context, InputKey, BranchRoot)
 		end
 
 		Steps += 1
+
+		local ShouldRecord = true
 
 		if Node.Type == "Brancher" then
 			SwitchBranch(Node.Branch)
@@ -742,86 +1047,147 @@ local function ExecuteGraph(Graph, Context, InputKey, BranchRoot)
 				end
 			end
 
+			local TargetBranch
+
 			if Held then
-				SwitchBranch(Node.HeldBranch)
+				TargetBranch = Node.HeldBranch
 			else
-				SwitchBranch(Node.ReleasedBranch)
+				TargetBranch = Node.ReleasedBranch
 			end
 
+			SwitchBranch(TargetBranch)
 			return
 
-		elseif Node.Type == "Tag" and Node.Mode == "Get" then
-			local TagName = tostring(Node.TagName or "Tagged")
-			local TagValue = Player:GetAttribute("CustomTag_" .. TagName)
+		elseif Node.Type == "Tag" then
+			if Node.Mode == "Get" then
+				ShouldRecord = false
 
-			if TagValue == true then
-				if SwitchBranch(Node.SuccessBranch) then
-					return
+				local AttributeName = "CustomTag_" .. tostring(Node.TagName or "Tagged")
+				local TagExists = Player:GetAttribute(AttributeName) ~= nil
+
+				if TagExists then
+					if SwitchBranch(Node.SuccessBranch) then
+						return
+					end
+				else
+					if SwitchBranch(Node.FailureBranch) then
+						return
+					end
 				end
 			else
-				if SwitchBranch(Node.FailureBranch) then
-					return
+				ExecuteTag(Node)
+			end
+
+		elseif Node.Type == "Loop" then
+			ShouldRecord = false
+
+			local NodeCount = math.clamp(
+				math.floor(tonumber(Node.NodeCount) or 1),
+				1,
+				25
+			)
+
+			local Repeats = math.clamp(
+				math.floor(tonumber(Node.Repeats) or 2),
+				1,
+				20
+			)
+
+			RepeatPreviousNodes(NodeCount, Repeats)
+
+		elseif Node.Type == "Bar" then
+			ShouldRecord = false
+
+			if HasHold then
+				warn("Bar cannot be used in a branch containing a Hold node.")
+			else
+				local MaxHold = math.clamp(
+					tonumber(Node.MaxHold) or 3,
+					0.1,
+					30
+				)
+
+				local SecondsPerLoop = math.max(
+					0.05,
+					tonumber(Node.SecondsPerLoop) or 0.5
+				)
+
+				local MaxLoops = math.clamp(
+					math.floor(tonumber(Node.MaxLoops) or 6),
+					1,
+					50
+				)
+
+				local Gui, Fill, Text = CreateProgressBar(
+					"CustomChargeBar",
+					"CHARGING"
+				)
+
+				local Started = os.clock()
+				local HeldDuration = 0
+
+				if InputKey then
+					while UserInputService:IsKeyDown(InputKey)
+						and os.clock() - Started < MaxHold do
+
+						HeldDuration = os.clock() - Started
+
+						Fill.Size = UDim2.new(
+							math.clamp(HeldDuration / MaxHold, 0, 1),
+							0,
+							1,
+							0
+						)
+
+						Text.Text = "CHARGING " .. string.format(
+							"%.1f",
+							HeldDuration
+						) .. "s"
+
+						task.wait(0.025)
+					end
 				end
+
+				if Gui.Parent then
+					Gui:Destroy()
+				end
+
+				local Loops = math.clamp(
+					math.floor(HeldDuration / SecondsPerLoop),
+					0,
+					MaxLoops
+				)
+
+				if History[#History] then
+					RepeatPreviousNodes(1, Loops)
+				end
+			end
+
+		elseif Node.Type == "Cooldown" then
+			ShouldRecord = false
+
+			local IsLastNode =
+				Graph.Nodes[#Graph.Nodes]
+				and Graph.Nodes[#Graph.Nodes].Id == Node.Id
+
+			local HasNext = Node.NextNodeId ~= nil
+				and Node.NextNodeId ~= ""
+
+			if IsLastNode and not HasNext then
+				StartCooldown(
+					Context.AbilityName or "E",
+					Node.Duration
+				)
+			else
+				warn("Cooldown nodes must be the final node in their branch.")
 			end
 
 		else
-			if Node.Type == "Tag" and Node.Mode == "Set" then
-				local TagName = tostring(Node.TagName or "Tagged")
-				Player:SetAttribute("CustomTag_" .. TagName, true)
-			else
-				if Node.Type == "Loop" then
-					local NodeCount = math.clamp(
-						math.floor(tonumber(Node.NodeCount) or 1),
-						1,
-						25
-					)
+			ExecuteNode(Node, Context)
+		end
 
-					local Repeats = math.clamp(
-						math.floor(tonumber(Node.Repeats) or 2),
-						1,
-						20
-					)
-
-					local StartIndex = math.max(
-						1,
-						#History - NodeCount + 1
-					)
-
-					local PreviousNodes = {}
-
-					for Index = StartIndex, #History do
-						table.insert(PreviousNodes, History[Index])
-					end
-
-					for RepeatIndex = 1, Repeats do
-						for _, PreviousNode in ipairs(PreviousNodes) do
-							if PreviousNode.Type ~= "Loop"
-								and PreviousNode.Type ~= "Brancher"
-								and PreviousNode.Type ~= "Hold"
-								and PreviousNode.Type ~= "Tag" then
-
-								Steps += 1
-
-								if Steps >= 500 then
-									break
-								end
-
-								ExecuteNode(PreviousNode, Context)
-							end
-						end
-
-						if Steps >= 500 then
-							break
-						end
-					end
-				else
-					ExecuteNode(Node, Context)
-				end
-			end
-
-			if Node.Type ~= "Loop" then
-				table.insert(History, Node)
-			end
+		if ShouldRecord then
+			table.insert(History, Node)
 		end
 
 		CurrentId = Node.NextNodeId
@@ -830,7 +1196,7 @@ end
 
 local function CreateBuilder()
 	local Data = {
-		Version = 3,
+		Version = 4,
 		Name = "Custom Class",
 		Description = "",
 		CurrencyName = "Coins",
@@ -937,7 +1303,7 @@ local function CreateBuilder()
 		BorderSizePixel = 0,
 		ScrollBarThickness = 3,
 		ScrollingDirection = Enum.ScrollingDirection.X,
-		CanvasSize = UDim2.fromOffset(1800, 0)
+		CanvasSize = UDim2.fromOffset(2600, 0)
 	})
 
 	Create("UIListLayout", Toolbar, {
@@ -1011,6 +1377,7 @@ local function CreateBuilder()
 	local CurrentBranch = "Main"
 	local SelectedNodeId = nil
 	local SelectedPassive = 1
+	local SwapSelectionId = nil
 	local Navigation = {}
 	local Dragging = nil
 	local LinesFrame = nil
@@ -1202,8 +1569,8 @@ local function CreateBuilder()
 
 			local Info = Label(
 				Inspector,
-				"Select a node to edit its settings. Connect nodes using NextNodeId.",
-				UDim2.new(1, -10, 0, 75)
+				"Select a node to edit its settings. Connect nodes using NextNodeId. Use SWAP POSITIONS to exchange two nodes' visual locations.",
+				UDim2.new(1, -10, 0, 85)
 			)
 
 			Info.TextColor3 = Colors.Muted
@@ -1246,21 +1613,18 @@ local function CreateBuilder()
 		end
 
 		local function AddToggle(FieldName, Options)
-			local Current = Node[FieldName]
-
-			if not table.find(Options, Current) then
-				Current = Options[1]
+			if not table.find(Options, Node[FieldName]) then
+				Node[FieldName] = Options[1]
 			end
-
-			Node[FieldName] = Current
 
 			local Toggle = Button(
 				Inspector,
-				FieldName .. ": " .. tostring(Current),
+				FieldName .. ": " .. tostring(Node[FieldName]),
 				UDim2.new(1, -10, 0, 36),
 				nil,
 				function()
 					local Index = table.find(Options, Node[FieldName]) or 1
+
 					Index += 1
 
 					if Index > #Options then
@@ -1268,6 +1632,7 @@ local function CreateBuilder()
 					end
 
 					Node[FieldName] = Options[Index]
+
 					RenderInspector()
 				end
 			)
@@ -1279,7 +1644,6 @@ local function CreateBuilder()
 
 		local function AddBranchChoice(FieldName)
 			local Names = GetBranchNames()
-
 			local Options = {}
 
 			for _, Name in ipairs(Names) do
@@ -1311,7 +1675,7 @@ local function CreateBuilder()
 			if #Options == 0 then
 				local NoParts = Label(
 					Inspector,
-					"Create a part preset in the PART VALUES section first.",
+					"Create a part preset in PART VALUES first.",
 					UDim2.new(1, -10, 0, 45)
 				)
 
@@ -1323,7 +1687,17 @@ local function CreateBuilder()
 			AddToggle(FieldName, Options)
 		end
 
-		AddField("NextNodeId", "")
+		if Node.Type ~= "Cooldown" then
+			AddField("NextNodeId", "")
+		else
+			local EndInfo = Label(
+				Inspector,
+				"Cooldown must be the final node in this branch. It cannot have a NextNodeId.",
+				UDim2.new(1, -10, 0, 55)
+			)
+
+			EndInfo.TextColor3 = Colors.Muted
+		end
 
 		if Node.Type == "Move" then
 			AddToggle("Direction", DirectionOptions)
@@ -1338,18 +1712,60 @@ local function CreateBuilder()
 			AddBranchChoice("Branch")
 
 		elseif Node.Type == "Hold" then
+			if GraphHasType(Graph, "Bar") then
+				Label(
+					Inspector,
+					"WARNING: This branch already has a Bar node. Hold and Bar cannot exist together in one branch.",
+					UDim2.new(1, -10, 0, 65)
+				).TextColor3 = Colors.Red
+			end
+
 			AddField("Duration", "1")
 			AddBranchChoice("HeldBranch")
 			AddBranchChoice("ReleasedBranch")
 
 		elseif Node.Type == "Tag" then
-			AddToggle("Mode", {"Set", "Get"})
+			AddToggle("Mode", {
+				"Set",
+				"Get",
+				"Reduce",
+				"Divide"
+			})
+
 			AddField("TagName", "Tagged")
 
-			if Node.Mode == "Get" then
+			if Node.Mode == "Set" then
+				AddField("TagValue", "1")
+
+			elseif Node.Mode == "Reduce" or Node.Mode == "Divide" then
+				AddField("Amount", "1")
+
+			elseif Node.Mode == "Get" then
 				AddBranchChoice("SuccessBranch")
 				AddBranchChoice("FailureBranch")
 			end
+
+		elseif Node.Type == "Bar" then
+			if GraphHasType(Graph, "Hold") then
+				Label(
+					Inspector,
+					"WARNING: This branch already has a Hold node. Bar and Hold cannot exist together in one branch.",
+					UDim2.new(1, -10, 0, 65)
+				).TextColor3 = Colors.Red
+			end
+
+			AddField("MaxHold", "3")
+			AddField("SecondsPerLoop", "0.5")
+			AddField("MaxLoops", "6")
+
+			Label(
+				Inspector,
+				"Repeats the previous executable node. Every SecondsPerLoop held adds one repetition.",
+				UDim2.new(1, -10, 0, 65)
+			).TextColor3 = Colors.Muted
+
+		elseif Node.Type == "Cooldown" then
+			AddField("Duration", "10")
 
 		elseif Node.Type == "Part" then
 			AddPartChoice("Preset")
@@ -1357,7 +1773,10 @@ local function CreateBuilder()
 			AddField("Lifetime", "0")
 
 		elseif Node.Type == "Teleport" then
-			AddToggle("Mode", {"Offset", "SavedPart"})
+			AddToggle("Mode", {
+				"Offset",
+				"SavedPart"
+			})
 
 			if Node.Mode == "SavedPart" then
 				AddField("TargetPart", "Part1")
@@ -1371,8 +1790,11 @@ local function CreateBuilder()
 			AddField("Duration", "3")
 			AddField("Length", "10")
 
-		elseif Node.Type == "Wait" then
-			AddField("Duration", "1")
+		elseif Node.Type == "Text" then
+			AddField("Text", "Hello!")
+			AddField("Duration", "2")
+			AddField("TextSize", "30")
+			AddField("Color", "255,255,255")
 
 		elseif Node.Type == "SetValue" then
 			local EditableButton = Button(
@@ -1393,7 +1815,11 @@ local function CreateBuilder()
 
 			if Node.Editable ~= false then
 				AddField("Key", "Power")
-				AddToggle("Operation", {"Add", "Multiply", "Set"})
+				AddToggle("Operation", {
+					"Add",
+					"Multiply",
+					"Set"
+				})
 				AddField("Amount", "1")
 
 				Label(
@@ -1439,6 +1865,33 @@ local function CreateBuilder()
 			end
 		end
 
+		local SwapButton = Button(
+			Inspector,
+			SwapSelectionId == Node.Id and "CANCEL POSITION SWAP" or "SWAP POSITIONS",
+			UDim2.new(1, -10, 0, 35),
+			nil,
+			function()
+				if SwapSelectionId == Node.Id then
+					SwapSelectionId = nil
+				else
+					SwapSelectionId = Node.Id
+				end
+
+				RenderInspector()
+			end
+		)
+
+		SwapButton.BackgroundColor3 =
+			SwapSelectionId == Node.Id and Colors.Green or Colors.Button
+
+		if SwapSelectionId == Node.Id then
+			Label(
+				Inspector,
+				"Now select another node on the canvas to exchange their positions.",
+				UDim2.new(1, -10, 0, 50)
+			).TextColor3 = Colors.Muted
+		end
+
 		Button(
 			Inspector,
 			"DELETE NODE",
@@ -1464,6 +1917,7 @@ local function CreateBuilder()
 				end
 
 				SelectedNodeId = nil
+				SwapSelectionId = nil
 
 				RenderGraph()
 			end
@@ -1595,6 +2049,31 @@ local function CreateBuilder()
 			NextLabel.ZIndex = 4
 
 			Card.Activated:Connect(function()
+				if SwapSelectionId then
+					if SwapSelectionId == Node.Id then
+						SwapSelectionId = nil
+					else
+						local FirstNode
+
+						for _, ExistingNode in ipairs(Graph.Nodes) do
+							if ExistingNode.Id == SwapSelectionId then
+								FirstNode = ExistingNode
+								break
+							end
+						end
+
+						if FirstNode then
+							FirstNode.X, Node.X = Node.X, FirstNode.X
+							FirstNode.Y, Node.Y = Node.Y, FirstNode.Y
+						end
+
+						SwapSelectionId = nil
+					end
+
+					RenderGraph()
+					return
+				end
+
 				SelectedNodeId = Node.Id
 				RenderGraph()
 			end)
@@ -1619,6 +2098,26 @@ local function CreateBuilder()
 		local Graph = GetGraph()
 
 		if not Graph then
+			return
+		end
+
+		if GraphHasType(Graph, "Cooldown") then
+			warn("Cooldown must remain the final node in its branch.")
+			return
+		end
+
+		if Type == "Bar" and GraphHasType(Graph, "Hold") then
+			warn("Bar cannot be added to a branch containing Hold.")
+			return
+		end
+
+		if Type == "Hold" and GraphHasType(Graph, "Bar") then
+			warn("Hold cannot be added to a branch containing Bar.")
+			return
+		end
+
+		if Type == "Cooldown" and GraphHasType(Graph, "Cooldown") then
+			warn("This branch already has a Cooldown node.")
 			return
 		end
 
@@ -1692,8 +2191,20 @@ local function CreateBuilder()
 			Tag = {
 				Mode = "Set",
 				TagName = "Tagged",
+				TagValue = "1",
+				Amount = "1",
 				SuccessBranch = "",
 				FailureBranch = ""
+			},
+
+			Bar = {
+				MaxHold = "3",
+				SecondsPerLoop = "0.5",
+				MaxLoops = "6"
+			},
+
+			Cooldown = {
+				Duration = "10"
 			},
 
 			Part = {
@@ -1713,6 +2224,13 @@ local function CreateBuilder()
 				TargetPart = "Part1",
 				Duration = "3",
 				Length = "10"
+			},
+
+			Text = {
+				Text = "Hello!",
+				Duration = "2",
+				TextSize = "30",
+				Color = "255,255,255"
 			}
 		}
 
@@ -1723,9 +2241,12 @@ local function CreateBuilder()
 		local Previous = Graph.Nodes[#Graph.Nodes]
 
 		if Previous then
-			if not Previous.NextNodeId or Previous.NextNodeId == "" then
-				Previous.NextNodeId = Node.Id
+			if Previous.NextNodeId and Previous.NextNodeId ~= "" then
+				warn("The last node is already connected. Add this node through the graph connections.")
+				return
 			end
+
+			Previous.NextNodeId = Node.Id
 		else
 			Graph.StartNodeId = Node.Id
 		end
@@ -1741,7 +2262,7 @@ local function CreateBuilder()
 	RenderToolbar = function()
 		Clear(Toolbar)
 
-		local function AddToolbarButton(Text, Callback, Selected)
+		local function AddToolbarButton(Text, Callback, Selected, Blocked)
 			local Object = Button(
 				Toolbar,
 				Text,
@@ -1752,6 +2273,8 @@ local function CreateBuilder()
 
 			if Selected then
 				Object.BackgroundColor3 = Colors.Selected
+			elseif Blocked then
+				Object.BackgroundColor3 = Colors.Red
 			end
 
 			return Object
@@ -1846,15 +2369,39 @@ local function CreateBuilder()
 			"Brancher",
 			"Hold",
 			"Tag",
+			"Bar",
+			"Cooldown",
 			"Part",
 			"Teleport",
-			"Rope"
+			"Rope",
+			"Text"
 		}
 
+		local Graph = GetGraph()
+
 		for _, Type in ipairs(Types) do
-			AddToolbarButton("+ " .. Type, function()
-				AddNode(Type)
-			end)
+			local Blocked = false
+
+			if Graph then
+				if Type == "Bar" and GraphHasType(Graph, "Hold") then
+					Blocked = true
+				elseif Type == "Hold" and GraphHasType(Graph, "Bar") then
+					Blocked = true
+				elseif Type ~= "Cooldown" and GraphHasType(Graph, "Cooldown") then
+					Blocked = true
+				elseif Type == "Cooldown" and GraphHasType(Graph, "Cooldown") then
+					Blocked = true
+				end
+			end
+
+			AddToolbarButton(
+				(Blocked and "! " or "+ ") .. Type,
+				function()
+					AddNode(Type)
+				end,
+				false,
+				Blocked
+			)
 		end
 	end
 
@@ -2226,7 +2773,7 @@ local function CreateBuilder()
 
 		local Info = Label(
 			DataScroll,
-			"Paste character JSON exported from the character builder. This will replace the current editor data.",
+			"Paste character JSON exported from the character builder. This replaces the current editor data.",
 			UDim2.new(1, -15, 0, 55)
 		)
 
@@ -2261,13 +2808,11 @@ local function CreateBuilder()
 
 			if not Success then
 				Status.Text = "Invalid JSON."
-				Status.TextColor3 = Colors.Red
 				return
 			end
 
 			if not NormalizeData(Result) then
 				Status.Text = "Invalid character data."
-				Status.TextColor3 = Colors.Red
 				return
 			end
 
@@ -2276,6 +2821,7 @@ local function CreateBuilder()
 			CurrentBranch = "Main"
 			SelectedNodeId = nil
 			SelectedPassive = 1
+			SwapSelectionId = nil
 
 			Refresh()
 		end)
@@ -2293,7 +2839,7 @@ local function CreateBuilder()
 
 		local Info = Label(
 			DataScroll,
-			"Generate your character data as JSON. This includes abilities, branches, values, part presets, passives and upgrades.",
+			"Generate character JSON. This includes abilities, branches, values, part presets, passives and upgrades.",
 			UDim2.new(1, -15, 0, 55)
 		)
 
@@ -2435,6 +2981,7 @@ local function CreateBuilder()
 				Section = SectionName
 				CurrentBranch = "Main"
 				SelectedNodeId = nil
+				SwapSelectionId = nil
 
 				Refresh()
 			end
@@ -2565,7 +3112,12 @@ local function CreateLoader()
 
 			if Trigger == "OnLoad" then
 				task.spawn(function()
-					ExecuteGraph(Graph, {Parts = {}})
+					ExecuteGraph(
+						Graph,
+						{Parts = {}, AbilityName = "E"},
+						nil,
+						Graph
+					)
 				end)
 
 			elseif Trigger == "EverySecond" then
@@ -2577,7 +3129,12 @@ local function CreateLoader()
 							break
 						end
 
-						ExecuteGraph(Graph, {Parts = {}})
+						ExecuteGraph(
+							Graph,
+							{Parts = {}, AbilityName = "E"},
+							nil,
+							Graph
+						)
 					end
 				end)
 
@@ -2596,7 +3153,12 @@ local function CreateLoader()
 						Debounce = true
 
 						task.spawn(function()
-							ExecuteGraph(Graph, {Parts = {}})
+							ExecuteGraph(
+								Graph,
+								{Parts = {}, AbilityName = "E"},
+								nil,
+								Graph
+							)
 
 							task.wait(0.3)
 
@@ -2847,7 +3409,7 @@ local function CreateLoader()
 		return true
 	end
 
-	Upgrades = function()
+	local Upgrades = function()
 		if not loadedCharacter then
 			return false
 		end
@@ -2855,7 +3417,7 @@ local function CreateLoader()
 		return OpenUpgradeShop()
 	end
 
-	EnableRSpecial = function()
+	local EnableRSpecial = function()
 		return false
 	end
 
@@ -2923,13 +3485,20 @@ elseif game.GameId == LOADER_ID or game.PlaceId == LOADER_ID then
 				return
 			end
 
+			if os.clock() < (CooldownEndTimes.E or 0) then
+				return
+			end
+
 			AbilityBusy = true
 
 			task.spawn(function()
 				local Success, Error = pcall(function()
 					ExecuteGraph(
 						loadedData.Ability,
-						{Parts = {}},
+						{
+							Parts = {},
+							AbilityName = "E"
+						},
 						Enum.KeyCode.E,
 						loadedData.Ability
 					)
