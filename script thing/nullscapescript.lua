@@ -9,7 +9,7 @@ end
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "le nullhub ui boiii",
+   Name = "nullbub script",
    Icon = 114293255506804, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "nullscape",
    LoadingSubtitle = "by nottreal",
@@ -64,7 +64,7 @@ local Window = Rayfield:CreateWindow({
    ConfigurationSaving = {
       Enabled = true,
       FolderName = nil, -- Create a custom folder for your hub/game
-      FileName = "Null Hub"
+      FileName = "nullbub"
    },
  
    Discord = {
@@ -76,12 +76,12 @@ local Window = Rayfield:CreateWindow({
    KeySystem = true, -- Set this to true to use our key system
    KeySettings = {
       Title = "Verification",
-      Subtitle = "are you ultra null boi",
+      Subtitle = "are you ultra nullbub",
       Note = "Put Yes", -- Use this to tell the user how to get a key
       FileName = "Nullestion", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
       SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
       GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"Yes", "yes", "yEs", "yeS", "YEs", "yES", "YES", "uber secret code that nobody will find out gulp", "throzyckd", "67", "slammy"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+      Key = {"Yes", "yes", "yEs", "yeS", "YEs", "yES", "YES", "uber secret code that nobody will find out gulp", "throzyckd", "67", "slammy", "nullbub is cool"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
    }
 })
 
@@ -107,12 +107,13 @@ local humanoid = char:WaitForChild("Humanoid")
 local ExecutingEnemy = false
 local ExecutingOthers = false
 local ExecutingHusk = false
+local ExecutingMart = false
 
 local Enemy = "Bell"
 
 local function message(text)
-	Rayfield:Notify(tostring(text))
-    print(text)
+	Rayfield:Notify("nullbub", tostring(text))
+    print("nullbub: " .. text)
 end
 
 local dist = 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 -- this holds up the entire enemy deleter script LOOL
@@ -128,6 +129,11 @@ end
 
 local function KillHusk(state)
     ExecutingHusk = state
+    sound()
+end
+
+local function KillMart(state)
+    ExecutingMart = state
     sound()
 end
 
@@ -153,15 +159,7 @@ whatever:CreateButton({
 
 MainTab:CreateParagraph({Title = "WIP", Content = "Missing more features i'd like to add, more things along the way, keybind is P! huge thanks to Nexer with their old hub scripts and me sharing just a bit of them!"})
 MainTab:CreateParagraph({Title = "Server", Content = "https://discord.gg/dKrbYz3g4h"})
-MainTab:CreateLabel("if the notification doesnt say anything check F9 mb im too tired to fix ill fix it later")
-
-local Button = MainTab:CreateButton({
-    Name = "Infinite Yield",
-    Callback = function()
-        sound()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-    end,
-})
+MainTab:CreateLabel("if the notification doesnt say anything check F9 mb im too tired to fix ill fix it later, also please use yield this script is just here to support all the automatic process you could use with yield really")
 
 -- // SlAMMY TAB \\ --
 
@@ -171,11 +169,15 @@ SlammyTab:CreateParagraph({Title = "random dude", Content = "reached level 40+ w
 
 -- // TIPS TAB \\ -- 
 NullbubtipsTab:CreateParagraph({Title = "General Help", Content = ""})
-NullbubtipsTab:CreateLabel("Please use this script on a solo run or a duo run with friends you trust")
-NullbubtipsTab:CreateLabel("It's recommended to use yields loopws and loopjp if you wanna go fast! i'm too lazy to make it myself")
-NullbubtipsTab:CreateLabel("If you wanna infinite jump, set keybind on yield space bar and set the keybind on jump command")
-NullbubtipsTab:CreateParagraph({Title = "Celestial Help", Content = ""})
-NullbubtipsTab:CreateLabel("The only attack that i assume is hitable is futile, so watch out for that when fighting celestial")
+NullbubtipsTab:CreateLabel("Please use this script on a solo run or with friends you trust")
+NullbubtipsTab:CreateLabel("It's recommended to use yields loopws if you wanna go fast. i'm too lazy to make it myself")
+NullbubtipsTab:CreateLabel("If you wanna infinite jump, set a command keybind on yield and set the keybind as the space bar and the command as jump")
+NullbubtipsTab:CreateLabel("It's very necessary to set command keybinds they help a LOT")
+NullbubtipsTab:CreateParagraph({Title = "FaQ", Content = ""})
+NullbubtipsTab:CreateLabel("You are fully immune to celestial during her fight, just watch out for tripmines if you're on standard or extreme")
+NullbubtipsTab:CreateLabel("im prob never gonna allow this script to run in the lobby sorry")
+NullbubtipsTab:CreateLabel("You are allowed to modify my script its open source for everyone")
+NullbubtipsTab:CreateLabel("it is not my fault if you get banned from the game lol")
 
 -- // GAME TAB \\ --
 
@@ -201,6 +203,15 @@ GameTab:CreateToggle({
     Flag = "ExecuteHusk",
     Callback = KillHusk
 })
+
+GameTab:CreateLabel("i think some people are gonna question the existance of this i added this because of beacon imp and beacon imp is just an transformed mart it isnt its own model sorry")
+GameTab:CreateToggle({
+    Name = "Kill Marts when the game starts",
+    CurrentValue = false,
+    Flag = "ExecuteMart",
+    Callback = KillMart
+})
+
 
 GameTab:CreateButton({
     Name = "Tripmine ESP",
@@ -229,6 +240,7 @@ GameTab:CreateButton({
     end,
 })
 
+GameTab:CreateLabel("Removing bells effect is irreversible.")
 GameTab:CreateButton({
     Name = "Remove Bells Effect",
     CurrentValue = false,
@@ -243,36 +255,37 @@ GameTab:CreateButton({
     end,
 })
 
+GameTab:CreateLabel("Anti Void is currently patched i am working on a rework please wait for it to release.")
+
 GameTab:CreateButton({
-    Name = "Activate Anti Void",
+    Name = "Fake Count Patch",
     CurrentValue = false,
-    Flag = "AntiVoid",
+    Flag = "FAKECOUNT",
     Callback = function()
-    sound()
-    if workspace:FindFirstChild('AntiVoid') then
-       message("AntiVoid already exists.")
-       return
-    end
-        local antivoidtpplace = "Center of the Map"
-        local a = workspace.KillVoid:Clone()
-        a.Position = workspace.KillVoid.Position + Vector3.new(0,20,0)
-        a.CanTouch = false
-        pcall(function() a.TouchInterest:Destroy() end)
-        pcall(function() a:FindFirstChildOfClass("TouchTransmitter"):Destroy() end)
-        task.wait()
-        a.CanCollide = true
-        a.Transparency = 1
-        a.Name = "AntiVoid"
-        a.Parent = workspace    
-        end,
+    	if game.Players.LocalPlayer.PlayerGui:FindFirstChild("fakecountboi") then
+    		game.Players.LocalPlayer.PlayerGui:FindFirstChild("fakecountboi"):Destroy()
+    	end
+    	local gui = Instance.new("ScreenGui")
+        gui.Name = "fakecountboi"
+        gui.DisplayOrder = 11
+        gui.Parent = game.Players.LocalPlayer.PlayerGui
+        local TripmineCounter = game.ReplicatedStorage.GiftCounters
+        local button = Instance.new("TextLabel")
+        button.Size = UDim2.new(0, 200, 0, 50)
+        button.Position = UDim2.new(0.5, -100, 0.9, -60)
+        button.Text = "" .. tostring(TripmineCounter.Gift:GetAttribute("Collected")) .. "/" .. tostring(TripmineCounter.Gift:GetAttribute("MaxGifts")) .. "" 
+        TripmineCounter.Gift:GetAttributeChangedSignal("Collected"):Connect(function()
+        	button.Text = "" .. tostring(TripmineCounter.Gift:GetAttribute("Collected")) .. "/" .. tostring(TripmineCounter.Gift:GetAttribute("MaxGifts")) .. "" 
+        end)
+        button.Parent = gui
+        button.TextScaled = true
+        sound()
+    end,
 })
 
+
 GameTab:CreateToggle({Name = "Auto-Remove Ice Tiles"; CurrentValue = false; Callback = function(Value)
-if WawawaCode == true then
-    pcall(function() workspace:FindFirstChild('WawawaCode'):Destroy() end)
-    return
-end
-WawawaCode = true
+WawawaCode = Value
 end; })
 
 -- // ENEMY TAB \\ --
@@ -313,32 +326,48 @@ end;})
 
 -- // FUN TAB \\ --
 
--- on hold for rework
+
 task.spawn(function()
     sfxfolder.NewLevel:Play()
     message("PLEASE DO NOT RUN THIS SCRIPT MORE THAN TWICE, THINGS MAY BREAK!")
 end)
 
-while true do
-if ExecutingEnemy == true and dist == 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 then -- i wasnt joking btw
-    for _, v in pairs(game.Workspace:FindFirstChild('Enemies'):GetChildren()) do
-        if v.Name == "Guardian" or v.Name == "ShadowGuardian" or v.Name == "Cadence" or v.Name == "StarMart" then
-            -- hi
-        else
-            pcall(function() v:Destroy() end)
-        end
+local blacklist = {
+    Cadence,
+    StarMart,
+    Guardian,
+    ShadowGuardian,
+    Mart, -- this is only here so he doesnt get enemy removed
+}
+
+local martlist = {
+    Mart,
+    RedMart
+}
+
+-- ok i reworked this it should lag less
+game.Workspace:FindFirstChild('Enemies').ChildAdded:Connect(function(childaddedboi)
+if ExecutingEnemy == true and dist == 9999999999999999999999999999999999999999999999999999999999999999999999999999999999 then -- i wasnt joking 2 btw
+    if table.find(blacklist, childaddedboi.Name) then
+    	-- hello
+    else
+        childaddedboi:Destroy()	
     end
+end
+if ExecutingMart == true then 
+	if table.find(martlist, childaddedboi.Name) then
+		childaddedboi:Destroy()
+	end
 end
 if ExecutingEnemy == false and ExecutingHusk == true then
    pcall(function() workspace.Skinwalkers:ClearAllChildren() end)
 end
-if WawawaCode == true then
-for _,c in next, workspace.CurrentRooms:GetDescendants() do
-if c:IsA("BasePart") and c.Material==Enum.Material.Ice then
-c.Material=Enum.Material.Plastic
-end
-end 
-end
+end)
 
-wait(0.05)
-end
+game.Workspace.CurrentRooms.ChildAdded:Connect(function(childaddedboi2)
+	for _,c in next, workspace.CurrentRooms:GetDescendants() do
+        if c:IsA("BasePart") and c.Material==Enum.Material.Ice then
+        c.Material=Enum.Material.Plastic
+        end
+    end
+end)
