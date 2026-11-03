@@ -320,11 +320,13 @@ local function DirectionVector(Direction, Root)
 	return Forward
 end
 
+local OpenUpgradeShop = nil
+
 local loadedData = nil
 local activeValues = {}
 local loadedCharacter = false
 
-local AbilityBusy = false
+local AbilityBusy = {E = false, R = false}
 
 local CooldownEndTimes = {
 	E = 0,
@@ -526,26 +528,35 @@ local function ExecuteNode(Node, Context)
 			300
 		)
 
-		local Duration = math.clamp(
-			tonumber(Node.Duration) or 0.25,
-			0.05,
-			15
-		)
+		if Node.Mode == "Boost" then
+			Root:ApplyImpulse(Direction * Distance * Root.AssemblyMass)
+		else
+			local Duration = math.clamp(
+				tonumber(Node.Duration) or 0.25,
+				0.05,
+				15
+			)
 
-		local Tween = TweenService:Create(
-			Root,
-			TweenInfo.new(
-				Duration,
-				Enum.EasingStyle.Quad,
-				Enum.EasingDirection.Out
-			),
-			{
-				CFrame = Root.CFrame + Direction * Distance
-			}
-		)
+			local Tween = TweenService:Create(
+				Root,
+				TweenInfo.new(
+					Duration,
+					Enum.EasingStyle.Quad,
+					Enum.EasingDirection.Out
+				),
+				{
+					CFrame = Root.CFrame + Direction * Distance
+				}
+			)
 
-		Tween:Play()
-		Tween.Completed:Wait()
+			Tween:Play()
+			Tween.Completed:Wait()
+		end
+
+	elseif Type == "Upgrade" then
+		if OpenUpgradeShop then
+			OpenUpgradeShop()
+		end
 
 	elseif Type == "Wait" then
 		task.wait(
@@ -567,6 +578,12 @@ local function ExecuteNode(Node, Context)
 			activeValues[Key] = Current + Amount
 		elseif Operation == "Multiply" then
 			activeValues[Key] = Current * Amount
+		elseif Operation == "Reduce" then
+			activeValues[Key] = Current - Amount
+		elseif Operation == "Divide" then
+			if Amount ~= 0 then
+				activeValues[Key] = Current / Amount
+			end
 		elseif Operation == "Set" then
 			activeValues[Key] = Amount
 		end
@@ -1700,9 +1717,26 @@ local function CreateBuilder()
 		end
 
 		if Node.Type == "Move" then
+			AddToggle("Mode", {"Move", "Boost"})
 			AddToggle("Direction", DirectionOptions)
 			AddField("Distance", "20")
-			AddField("Duration", "0.25")
+
+			if Node.Mode ~= "Boost" then
+				AddField("Duration", "0.25")
+			else
+				Label(
+					Inspector,
+					"Boost applies an impulse in the selected direction. Distance controls its strength.",
+					UDim2.new(1, -10, 0, 55)
+				).TextColor3 = Colors.Muted
+			end
+
+		elseif Node.Type == "Upgrade" then
+			Label(
+				Inspector,
+				"Opens the character's upgrade shop when this node runs.",
+				UDim2.new(1, -10, 0, 55)
+			).TextColor3 = Colors.Muted
 
 		elseif Node.Type == "Loop" then
 			AddField("NodeCount", "1")
@@ -1817,7 +1851,9 @@ local function CreateBuilder()
 				AddField("Key", "Power")
 				AddToggle("Operation", {
 					"Add",
+					"Reduce",
 					"Multiply",
+					"Divide",
 					"Set"
 				})
 				AddField("Amount", "1")
@@ -2140,10 +2176,13 @@ local function CreateBuilder()
 
 		local Defaults = {
 			Move = {
+				Mode = "Move",
 				Direction = "Forward",
 				Distance = "20",
 				Duration = "0.25"
 			},
+
+			Upgrade = {},
 
 			Wait = {
 				Duration = "1"
@@ -2360,6 +2399,7 @@ local function CreateBuilder()
 
 		local Types = {
 			"Move",
+			"Upgrade",
 			"Wait",
 			"SetValue",
 			"Particle",
@@ -3211,7 +3251,7 @@ local function CreateLoader()
 		end
 	end
 
-	local function OpenUpgradeShop()
+	OpenUpgradeShop = function()
 		if not loadedCharacter or not loadedData or ShopOpen then
 			return false
 		end
@@ -3418,7 +3458,7 @@ local function CreateLoader()
 	end
 
 	local EnableRSpecial = function()
-		return false
+		return true
 	end
 
 	_G.Upgrades = Upgrades
@@ -3480,49 +3520,47 @@ elseif game.GameId == LOADER_ID or game.PlaceId == LOADER_ID then
 			return
 		end
 
+		local AbilityName
+		local Graph
+
 		if Input.KeyCode == Enum.KeyCode.E then
-			if AbilityBusy then
-				return
-			end
-
-			if os.clock() < (CooldownEndTimes.E or 0) then
-				return
-			end
-
-			AbilityBusy = true
-
-			task.spawn(function()
-				local Success, Error = pcall(function()
-					ExecuteGraph(
-						loadedData.Ability,
-						{
-							Parts = {},
-							AbilityName = "E"
-						},
-						Enum.KeyCode.E,
-						loadedData.Ability
-					)
-				end)
-
-				if not Success then
-					warn("Ability error:", Error)
-				end
-
-				AbilityBusy = false
-			end)
+			AbilityName = "E"
+			Graph = loadedData.Ability
+		elseif Input.KeyCode == Enum.KeyCode.R then
+			AbilityName = "R"
+			Graph = loadedData.AltAbility
+		else
+			return
 		end
+
+		if AbilityBusy[AbilityName] then
+			return
+		end
+
+		if os.clock() < (CooldownEndTimes[AbilityName] or 0) then
+			return
+		end
+
+		AbilityBusy[AbilityName] = true
+
+		task.spawn(function()
+			local Success, Error = pcall(function()
+				ExecuteGraph(
+					Graph,
+					{
+						Parts = {},
+						AbilityName = AbilityName
+					},
+					Input.KeyCode,
+					Graph
+				)
+			end)
+
+			if not Success then
+				warn(AbilityName .. " ability error:", Error)
+			end
+
+			AbilityBusy[AbilityName] = false
+		end)
 	end)
-end
-
-if game.PlaceId == LOADER_ID then
-	game.ReplicatedStorage.UpgradeFolder.Upgrades.ChildAdded:Connect(function(childaddedboisssss)
-        if childaddedboisssss.Name == "NinjaBelt" then
-        	EnableRSpecial()
-        end
-    end)
-
-    while true do
-    	wait(task.random(180, 320))
-        Upgrades()
-    end
 end
